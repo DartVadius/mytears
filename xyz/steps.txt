@@ -1,0 +1,172 @@
+ТЗ
+1. Laravel
+2. MySQL
+3. Doctrine 2
+4. Docker
+5. Redis
+6. ElasticSearch
+7. Backend - Blade
+8. Frontend - Vue.js (axios, vuex, vuex-persistedstate)
+9. Bootstrap 4
+10. REST API
+11. Social login
+12. Tests
+13. RabbitMQ
+
+1. Устанавливаем composer глобально
+sudo apt update
+
+Now, let's install the dependencies. We'll need curl in order to download Composer and php-cli for installing and running it.
+The php-mbstring package is necessary to provide functions for a library we'll be using. git is used by Composer for
+downloading project dependencies, and unzip for extracting zipped packages. Everything can be installed with the following command:
+
+sudo apt install curl php-cli php-mbstring git unzip
+
+cd ~
+curl -sS https://getcomposer.org/installer -o composer-setup.php
+Next, verify that the installer matches the SHA-384 hash for the latest installer found on the Composer Public Keys / Signatures page.
+Copy the hash from that page and store it as a shell variable:
+
+HASH=544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061
+Make sure that you substitute the latest hash for the highlighted value.
+
+Now execute the following PHP script to verify that the installation script is safe to run:
+
+php -r "if (hash_file('SHA384', 'composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+You'll see the following output.
+
+Output
+Installer verified
+
+To install composer globally, use the following command which will download and install Composer as a system-wide command named composer, under /usr/local/bin:
+
+sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+
+To test your installation, run:
+
+composer
+
+2. Устанавливаем Laravel (5.7 на данный момент)
+
+composer create-project --prefer-dist laravel/laravel blog
+composer install
+
+проверка
+$ php -S localhost:8080 -t public
+или
+$ php artisan serve
+http://localhost:8080/ или http://localhost:8000/ если artisan
+
+для продакшена
+composer install --no-dev
+
+2.1 Настраиваем PHPStorm
+помечаем папки как source/excluded/resources etc
+устанавливаем плагин LaravelPlugin - теперь работают редиректы по ctrl+lmk : например из роутера можно перейти сразу на контроллер или представление
+
+3. Устанавливаем Docker
+
+4. Конфигурация докера
+
+5 .env - настраиваем для работы через докер
+Прописываем порты, которые указаны в docker-compose.yml
+Настраиваем кеширование:
+CACHE_DRIVER=redis
+SESSION_DRIVER=redis
+
+6 Дополнительное по
+
+composer require barryvdh/laravel-ide-helper
+composer require barryvdh/laravel-debugbar --dev
+composer require predis/predis
+
+config/app.php, in providers array (не обязательно):
+Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+Barryvdh\Debugbar\ServiceProvider::class,
+
+Автогенерация PHPDoc для фасадов: php artisan ide-helper:generate
+теперь PHPStorm нормально видит фасады и работает автоподстановка
+
+You can configure your composer.json чтобы генерировать доки после каждого изменения в папке vendor:
+
+"scripts":{
+    "post-update-cmd": [
+        "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+        "php artisan ide-helper:generate",
+        "php artisan ide-helper:meta"
+    ]
+},
+
+если нужно настройить плагин barryvdh/laravel-ide-helper:
+или вручную копируем /vendor/barryvdh/laravel-ide-helper/config/ide-helper.php в /config
+или выполняем команду php artisan vendor:publish --provider="Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider" --tag=config
+(так можно публиковать любые конфиги из вендора для настройки плагинов)
+и в /config/ide-helper.php настраиваем плагин
+
+7 Make-file
+
+8 Стартуем Laravel
+
+https://localhost:8080/
+
+// 9 Аутентификация
+// php artisan  make:auth - создаем роуты и представления для регистрации/логина
+// php artisan migrate - создаем БД
+
+10 Подключаем доктрину
+composer require laravel-doctrine/orm
+After updating composer, add the ServiceProvider to the providers array in config/app.php
+LaravelDoctrine\ORM\DoctrineServiceProvider::class,
+
+Register the EntityManager, Registry and Doctrine facade in 'aliases' array:
+'EntityManager' => LaravelDoctrine\ORM\Facades\EntityManager::class,
+'Registry'      => LaravelDoctrine\ORM\Facades\Registry::class,
+'Doctrine'      => LaravelDoctrine\ORM\Facades\Doctrine::class,
+
+Публикуем конфиг
+php artisan vendor:publish --tag="config"
+
+By default, Laravel's application skeleton has its Model classes in the app/ folder.
+With Doctrine, you'll need to create a dedicated folder for your Entities and point your  config/doctrine.php paths array to it.
+If you don't, Doctrine will scan your whole app/ folder for files, which will have a huge impact on performance!
+
+'paths' => [
+    base_path('app/Entities'),
+],
+
+11. Doctrine migrations
+composer require "laravel-doctrine/migrations"
+
+After updating composer, add the ServiceProvider to the providers array in config/app.php
+LaravelDoctrine\Migrations\MigrationsServiceProvider::class,
+
+Устанавливаем дополнения
+composer require "laravel-doctrine/extensions:1.0.*"
+composer require "gedmo/doctrine-extensions=^2.4"
+
+If you are using an annotation driver, then add the Gedmo (Behavioral) extensions service provider in config/app.php:
+LaravelDoctrine\Extensions\GedmoExtensionsServiceProvider::class,
+
+12. Аутентификация
+https://isaacearl.com/blog/laravel-doctrine-setup
+
+в класс user добавить аннотацию
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="users")
+ */
+иначе не получиться сгенерировать миграцию
+
+в конце сделать php artisan ide-helper:generate чтобы подсвечивались методы из User во вьюхах
+
+13. Git
+
+
+
+
+
+
+sudo chown -R $USER:www-data storage
+sudo chown -R $USER:www-data bootstrap/cache
+chmod -R 775 storage
+chmod -R 775 bootstrap/cache
