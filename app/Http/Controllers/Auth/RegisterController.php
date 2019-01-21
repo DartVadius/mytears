@@ -68,6 +68,7 @@ class RegisterController extends Controller
         $user->setName($data['name']);
         $user->setEmail($data['email']);
         $user->setPassword(Hash::make($data['password']));
+        $user->setRole(User::ROLE_USER)->setStatus(User::STATUS_NO_CONFIRM)->generateVerifyCode();
         \EntityManager::persist($user);
         \EntityManager::flush();
         return $user;

@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Entities\User;
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\User\UserRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(UserRepository::class, function($app) {
+            // This is what Doctrine's EntityRepository needs in its constructor.
+            return new UserRepository(
+                $app['em'],
+                $app['em']->getClassMetaData(User::class)
+            );
+        });
     }
 }

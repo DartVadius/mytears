@@ -5,7 +5,7 @@
 4. Docker
 5. Redis
 6. ElasticSearch
-7. Backend - Blade
+7. Backend - Blade ?????
 8. Frontend - Vue.js (axios, vuex, vuex-persistedstate)
 9. Bootstrap 4
 10. REST API
@@ -161,9 +161,41 @@ https://isaacearl.com/blog/laravel-doctrine-setup
 
 13. Git
 
+14. делаем заговтовку админки
+создаем новый контроллер контроллер
+php artisan make:controller Admin/AdminController
+копируем туда код из HomeController
+добавляем представление admin.blade.php
+добавляем в routes/web.php новый маршрут
+Route::get('/admin', 'Admin\AdminController@index')->name('admin');
 
+Добавляем в модель User поля $role и $authToken, $status, $verifyCode, добавляем метод для добавления роли и статуса,
+в контроллере регистрации заполняем поле роли и статуса
+генерируем и применяем миграции
 
+15. В routes/web.php создаем группу для роутов админки
 
+16. Генерация фикстур
+добавляем сидер для таблицы юзеров, который использует доктрину (т.к. наша модель юзеров не наследуется от модели Ларавель,
+мы не можем использовать стандартные фабрики Laravel для создания фикстур, поэтому объекты пользователей создаем сразу в сидере)
+запускаем сидер php artisan db:seed --class=UsersTableSeeder
+
+17. Создаем базовый репозиторий от которого будут наследоваться все наши репозитории
+добавляем трейт для пагинации запросов
+имплементируем BaseRepositoryInterface и пишем реализацию, для большего удобства сохранения сущностей
+
+18. Создаем репозиторий для модели User
+добавляем в аннотации модели юзер связь с класом репозиторием @ORM\Entity(repositoryClass="User\UserRepository")
+генерируем класс репозитория php artisan doctrine:generate:repositories
+исправляем неймспейс
+создаем интерфейс для репозитория пользователя
+имплементируем его в репозиторий
+регистрируем репозиторий в сервиспровайдере
+
+19. Добавление админа с помощью консольной команды
+создаем новую консольную комманду
+php artisan make:command User/CreateAdminCommand
+код в app/Console/Commands/User/CreateAdminCommand.php
 
 
 sudo chown -R $USER:www-data storage

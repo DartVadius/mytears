@@ -12,6 +12,9 @@ use Doctrine\ORM\Mapping AS ORM;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
+//use Illuminate\Validation\Rule;
 use LaravelDoctrine\Extensions\Timestamps\Timestamps;
 use LaravelDoctrine\ORM\Auth\Authenticatable;
 use LaravelDoctrine\ORM\Notifications\Notifiable;
@@ -20,10 +23,35 @@ use LaravelDoctrine\ORM\Notifications\Notifiable;
 /**
  * @ORM\Entity
  * @ORM\Table(name="users")
+ * @ORM\Entity(repositoryClass="User\UserRepository")
  */
 class User implements AuthenticatableContract, CanResetPasswordContract
 {
     use Authenticatable, CanResetPassword, Timestamps, Notifiable;
+
+    const ROLE_ADMIN = 'admin';
+    const ROLE_USER = 'user';
+
+    const STATUS_CONFIRM = '1';
+    const STATUS_NO_CONFIRM = '2';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name', 'email', 'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password', 'remember_token', 'auth_token', 'verify_code'
+    ];
 
     /**
      * @ORM\Id
@@ -31,16 +59,41 @@ class User implements AuthenticatableContract, CanResetPasswordContract
      * @ORM\Column(type="integer")
      */
     protected $id;
+
     /**
      * @var string
      * @ORM\Column(type="string")
      */
     protected $email;
+
     /**
      * @var string
      * @ORM\Column(type="string",nullable=false)
      */
     protected $name;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string",nullable=false)
+     */
+    protected $role;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string",nullable=false)
+     */
+    protected $status;
+
+    /**
+     * @ORM\Column(name="auth_token", type="string", nullable=true, unique=true)
+     */
+    protected $authToken;
+
+    /**
+     * @ORM\Column(name="verify_code", type="string", nullable=true, unique=true)
+     */
+    protected $verifyCode;
+
     /**
      * @return mixed
      */
@@ -48,6 +101,7 @@ class User implements AuthenticatableContract, CanResetPasswordContract
     {
         return $this->id;
     }
+
     /**
      * @return string
      */
@@ -55,6 +109,7 @@ class User implements AuthenticatableContract, CanResetPasswordContract
     {
         return $this->email;
     }
+
     /**
      * @param string $email
      */
@@ -62,6 +117,7 @@ class User implements AuthenticatableContract, CanResetPasswordContract
     {
         $this->email = $email;
     }
+
     /**
      * @return string
      */
@@ -69,6 +125,7 @@ class User implements AuthenticatableContract, CanResetPasswordContract
     {
         return $this->name;
     }
+
     /**
      * @param string $name
      */
@@ -76,12 +133,63 @@ class User implements AuthenticatableContract, CanResetPasswordContract
     {
         $this->name = $name;
     }
+
     /**
      * @return int
      */
     public function getKey()
     {
         return $this->getId();
+    }
+
+    /**
+     * @param $role
+     * @return $this
+     * @throws \Exception
+     */
+    public function setRole($role) {
+        $roles = [self::ROLE_USER, self::ROLE_ADMIN];
+        if (in_array($role, $roles)) {
+            $this->role = $role;
+            return $this;
+        } else {
+            throw new \Exception('Wrong value');
+        }
+//        if (Rule::in([self::ROLE_USER, self::ROLE_ADMIN])) {
+//            $this->role = $role;
+//            return $this;
+//        } else {
+//            throw new \Exception('Wrong value');
+//        }
+     }
+
+    /**
+     * @param $status
+     * @return $this
+     * @throws \Exception
+     */
+    public function setStatus($status) {
+        $statuses = [self::STATUS_CONFIRM, self::STATUS_NO_CONFIRM]; // самописный вариант
+        if (in_array($status, $statuses)) {
+            $this->status = $status;
+            return $this;
+        } else {
+            throw new \Exception('Wrong value');
+        }
+//        if (Rule::in([self::STATUS_CONFIRM, self::STATUS_NO_CONFIRM])) { // вариант с использованием классов ларавел
+//            $this->status = $status;
+//            return $this;
+//        } else {
+//            throw new \Exception('Wrong value');
+//        }
+    }
+
+    /**
+     * @return $this
+     */
+    public function generateVerifyCode() {
+        $this->verifyCode = Str::uuid();
+        return $this;
     }
 
 }
