@@ -9,6 +9,7 @@
 namespace App\Entities;
 
 use Doctrine\ORM\Mapping AS ORM;
+use DateTime;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
@@ -23,7 +24,7 @@ use LaravelDoctrine\ORM\Notifications\Notifiable;
 /**
  * @ORM\Entity
  * @ORM\Table(name="users")
- * @ORM\Entity(repositoryClass="User\UserRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\User\UserRepository")
  */
 class User implements AuthenticatableContract, CanResetPasswordContract
 {
@@ -50,7 +51,7 @@ class User implements AuthenticatableContract, CanResetPasswordContract
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token', 'auth_token', 'verify_code'
+        'password', 'remember_token', 'api_token', 'verify_code', 'refresh_token'
     ];
 
     /**
@@ -84,10 +85,21 @@ class User implements AuthenticatableContract, CanResetPasswordContract
      */
     protected $status;
 
-    /**
-     * @ORM\Column(name="auth_token", type="string", nullable=true, unique=true)
-     */
-    protected $authToken;
+//    /**
+//     * @ORM\Column(name="api_token", type="string", nullable=true, unique=true)
+//     */
+//    protected $apiToken;
+//
+//    /**
+//     * @ORM\Column(name="api_token_expired", type="datetime", nullable=true)
+//     * @var DateTime
+//     */
+//    protected $authTokenExpired;
+//
+//    /**
+//     * @ORM\Column(name="refresh_token", type="string", nullable=true, unique=true)
+//     */
+//    protected $refreshToken;
 
     /**
      * @ORM\Column(name="verify_code", type="string", nullable=true, unique=true)
@@ -100,6 +112,27 @@ class User implements AuthenticatableContract, CanResetPasswordContract
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAuthToken() {
+        return $this->authToken;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRefreshToken() {
+        return $this->refreshToken;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getExpired() {
+        return $this->authTokenExpired;
     }
 
     /**
@@ -147,13 +180,14 @@ class User implements AuthenticatableContract, CanResetPasswordContract
      * @return $this
      * @throws \Exception
      */
-    public function setRole($role) {
+    public function setRole($role)
+    {
         $roles = [self::ROLE_USER, self::ROLE_ADMIN];
         if (in_array($role, $roles)) {
             $this->role = $role;
             return $this;
         } else {
-            throw new \Exception('Wrong value');
+            throw new \InvalidArgumentException('Wrong value');
         }
 //        if (Rule::in([self::ROLE_USER, self::ROLE_ADMIN])) {
 //            $this->role = $role;
@@ -161,20 +195,21 @@ class User implements AuthenticatableContract, CanResetPasswordContract
 //        } else {
 //            throw new \Exception('Wrong value');
 //        }
-     }
+    }
 
     /**
      * @param $status
      * @return $this
      * @throws \Exception
      */
-    public function setStatus($status) {
+    public function setStatus($status)
+    {
         $statuses = [self::STATUS_CONFIRM, self::STATUS_NO_CONFIRM]; // самописный вариант
         if (in_array($status, $statuses)) {
             $this->status = $status;
             return $this;
         } else {
-            throw new \Exception('Wrong value');
+            throw new \InvalidArgumentException('Wrong value');
         }
 //        if (Rule::in([self::STATUS_CONFIRM, self::STATUS_NO_CONFIRM])) { // вариант с использованием классов ларавел
 //            $this->status = $status;
@@ -187,9 +222,18 @@ class User implements AuthenticatableContract, CanResetPasswordContract
     /**
      * @return $this
      */
-    public function generateVerifyCode() {
+    public function generateVerifyCode()
+    {
         $this->verifyCode = Str::uuid();
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
     }
 
 }

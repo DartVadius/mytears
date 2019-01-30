@@ -24,7 +24,7 @@ Route::group(
     [
         'prefix' => 'admin',
         'namespace' => 'Admin',
-        'middleware' => ['auth']
+        'middleware' => ['auth', 'can:admin']
     ],
     function () {
         Route::get('/', 'AdminController@index')->name('admin');

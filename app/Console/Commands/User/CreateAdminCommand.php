@@ -36,8 +36,7 @@ class CreateAdminCommand extends Command
 
     /**
      * @return bool
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Exception
      */
     public function handle()
     {
@@ -53,9 +52,7 @@ class CreateAdminCommand extends Command
             $this->error('Email already exist');
             return false;
         }
-        $this->repo->persist($user);
-        $this->repo->flush();
-        $this->repo->clear();
+        $this->repo->save($user);
         $this->info('Success ');
         return true;
     }

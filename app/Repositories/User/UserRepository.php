@@ -2,10 +2,8 @@
 
 namespace App\Repositories\User;
 
-use App\Entities\User;
 use App\Interfaces\UserInterface;
 use App\Repositories\BaseRepository;
-use LaravelDoctrine\ORM\Pagination\PaginatesFromRequest;
 
 /**
  * UserRepository
@@ -15,9 +13,6 @@ use LaravelDoctrine\ORM\Pagination\PaginatesFromRequest;
  */
 class UserRepository extends BaseRepository implements UserInterface
 {
-
-    use PaginatesFromRequest;
-
     public function findByEmail($email)
     {
         return $this->findOneBy(['email' => $email]);

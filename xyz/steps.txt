@@ -185,9 +185,12 @@ Route::get('/admin', 'Admin\AdminController@index')->name('admin');
 имплементируем BaseRepositoryInterface и пишем реализацию, для большего удобства сохранения сущностей
 
 18. Создаем репозиторий для модели User
-добавляем в аннотации модели юзер связь с класом репозиторием @ORM\Entity(repositoryClass="User\UserRepository")
+добавляем в аннотации модели юзер связь с класом репозиторием @ORM\Entity(repositoryClass="App\Repositories\User\UserRepository")
 генерируем класс репозитория php artisan doctrine:generate:repositories
-исправляем неймспейс
+
+!!! Есть проблема с путями при генерации  - из созданной папки нужно перетащить получившийся класс в папку Repositories/User
+лучше создавать репозитории руками??
+
 создаем интерфейс для репозитория пользователя
 имплементируем его в репозиторий
 регистрируем репозиторий в сервиспровайдере
@@ -197,6 +200,42 @@ Route::get('/admin', 'Admin\AdminController@index')->name('admin');
 php artisan make:command User/CreateAdminCommand
 код в app/Console/Commands/User/CreateAdminCommand.php
 
+пример запуска команды: php artisan make:admin vad261275@1gmail.com pass
+
+20. Создаем павила авторизации для админа
+в AuthServiceProvider регистрируем новый гейт, который будет фильтровать юзеров по роли админа
+
+зарегистрированное правило можно применять через конструктор контроллера или в навесить на группу админ роутов в
+routes/web.php
+
+
+21. АПИ регистрация
+Создаем в Controllers папку Api, в которой будут находиться все наши апи контроллеры
+В ней создаем папку Auth и копируем туда RegisterController, редактируем его чтобы он возвращал json
+Регистрируем роут в routes/api.php: Route::post('/register', 'Api\Auth\RegisterController@register');
+
+Протестировать можно с помощью Postman, в случае успеха получим ответ
+{
+    "success": "New user was registered"
+}
+или если данные были невалидны что-то вроде
+{
+    "message": "The given data was invalid.",
+    "errors": {
+        "name": [
+            "The name field is required."
+        ],
+        "email": [
+            "The email field is required."
+        ],
+        "password": [
+            "The password field is required."
+        ]
+    }
+}
+
+аутентификация - процесс залогинивания, т.е. техническая часть
+авторизация - процесс определения ролей и прав доступа
 
 sudo chown -R $USER:www-data storage
 sudo chown -R $USER:www-data bootstrap/cache

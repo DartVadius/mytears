@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Api\Auth;
 
 use App\Entities\User;
 use App\Repositories\User\UserRepository;
 use App\Http\Controllers\Controller;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
 {
-
-    use RegistersUsers;
 
     /**
      * Where to redirect users after registration.
@@ -29,7 +29,6 @@ class RegisterController extends Controller
      */
     public function __construct(UserRepository $repository)
     {
-        $this->middleware('guest');
         $this->userRepository = $repository;
     }
 
@@ -44,24 +43,30 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:App\Entities\User'],
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'password' => ['required', 'string', 'min:6'],
         ]);
     }
 
     /**
-     * @param array $data
-     * @return User
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException
      */
-    protected function create(array $data)
+    protected function register(Request $request)
     {
+        $data = $request->all();
+        $this->validator($request->all())->validate();
+
         $user = new User();
         $user->setName($data['name']);
         $user->setEmail($data['email']);
         $user->setPassword(Hash::make($data['password']));
         $user->setRole(User::ROLE_USER)->setStatus(User::STATUS_NO_CONFIRM)->generateVerifyCode();
         $this->userRepository->save($user);
-        return $user;
+
+        event(new Registered($user));
+
+        return response()->json(['success' => 'New user was registered'], Response::HTTP_CREATED);
     }
 }

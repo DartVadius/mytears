@@ -11,7 +11,6 @@ namespace App\Interfaces;
 
 interface BaseRepositoryInterface
 {
-    public function persist($entity);
-    public function flush($entity);
-    public function clear();
+    public function save($entity);
+    public function delete($entity);
 }
