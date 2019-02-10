@@ -1,17 +1,18 @@
 ТЗ
-1. Laravel
-2. MySQL
-3. Doctrine 2
-4. Docker
+1. Laravel +
+2. MySQL +
+3. Doctrine 2 +
+4. Docker +
 5. Redis
 6. ElasticSearch
-7. Backend - Blade ?????
+7. Backend - Blade ????? -
 8. Frontend - Vue.js (axios, vuex, vuex-persistedstate)
 9. Bootstrap 4
-10. REST API
+10. REST API +
 11. Social login
 12. Tests
 13. RabbitMQ
+14. Логирование действий пользователей https://github.com/spatie/laravel-activitylog  https://docs.spatie.be/laravel-activitylog/v3/introduction
 
 1. Устанавливаем composer глобально
 sudo apt update
@@ -67,6 +68,31 @@ composer install --no-dev
 3. Устанавливаем Docker
 
 4. Конфигурация докера
+старый конфиг mysql
+mysql:
+    image: mysql:5.7
+    volumes:
+    - ./storage/docker/mysql:/var/lib/mysql
+    environment:
+    - "MYSQL_ROOT_PASSWORD=mytears_secret_root_pass"
+    - "MYSQL_USER=mytears_user"
+    - "MYSQL_PASSWORD=mytears_secret_pass"
+    - "MYSQL_DATABASE=mytears"
+    ports:
+    - "33061:3306"
+конфиг после апгрейда до mysql:8.0
+mysql:
+    image: mysql:8.0.14
+    volumes:
+    - ./storage/docker/mysql:/var/lib/mysql
+    environment:
+    - "MYSQL_ROOT_PASSWORD=mytears_secret_root_pass"
+    - "MYSQL_DATABASE=mytears"
+    - "MYSQL_USER=root"
+    - "MYSQL_PASSWORD=mytears_secret_root_pass"
+    ports:
+    - "33061:3306"
+    command: "--default-authentication-plugin=mysql_native_password"
 
 5 .env - настраиваем для работы через докер
 Прописываем порты, которые указаны в docker-compose.yml
@@ -233,6 +259,86 @@ routes/web.php
         ]
     }
 }
+
+22. Подключаем Laravel passport и настраиваем его для использования с Doctrine
+https://isaacearl.com/blog/laravel-doctrine-setup
+
+php artisan passport:install
+
+22.1 В app/Exceptions/Handler.php обрабатываем 403 ошибку (неавторизовано), чтобы в консоль не валился трейс
+
+23. Тестируем ендпоинты (все в постмане)
+
+24. Пишем сериалайзер для сущности Users который будет преобразовывать объект в json
+если не использовать доктрину, в элоквете ларавеля, в базовой модели, от которой наследуются все остальные методы уже есть
+такие методы, но мы не используем элоквет
+
+сразу выносим наш сериалайзер в отдельный трейт, чтобы использовать его в будущем и в других наших моделях
+app/Services/Traits/Serializer.php
+
+25. Но если на запросы нужно будет возващать разные наборы данных нашей модел, лучше использоать ресурсы ларавел
+php artisan  make:resource UserResource
+в app/Http/Resources/UserResource.php формируем массив, который будет возвращаться при обращении к данному ресурсу
+
+26. Апгрейд mysql до версии 8.0
+в docker-compose.yml меняем образ на image: mysql:8.0.14
+добавляем command: "--default-authentication-plugin=mysql_native_password" для решения проблемы аутентификации
+если раньше мы уже поднимали контейнер с mysql версии 5.* может появиться следующая ошибка
+Mysql Error:The user specified as a definer ('mysql.infoschema'@'localhost') does not exist'
+для исправления делаем следующее
+docker-compose exec mysql bash
+mysql -u root -p root_pass
+SET GLOBAL innodb_fast_shutdown = 1;
+quit;
+mysql_upgrade -u root -p root_pass
+
+в config/database.php добавляем настройки mysql
+'version' => 8,
+            'modes' => [
+                'ONLY_FULL_GROUP_BY',
+                'STRICT_TRANS_TABLES',
+                'NO_ZERO_IN_DATE',
+                'NO_ZERO_DATE',
+                'ERROR_FOR_DIVISION_BY_ZERO',
+                'NO_ENGINE_SUBSTITUTION',
+            ],
+
+27. Рисуем структуру бд в воркбенче
+28. Добавляем модели и репозитории согласно разработанной структуре, регистрируем репозитории в сервиспровайдере
+добавляем Sluggable расширение для доктрины https://www.laraveldoctrine.org/docs/1.3/extensions/sluggable
+при маппинге используем soft delete и sluggable расширения доктрины
+
+29. Роуты, контроллеры, репозитории
+
+Вылетела ошибка getProxyDefinition(): Failed opening required '/tmp/__CG__AppTeam.php
+
+в .env добавил DOCTRINE_PROXY_AUTOGENERATE=true
+на продакшене нужно выставить в false!!! и затем php artisan doctrine:generate:proxies
+
+29.1 Категории
+
+Создаем CategoryResource для сериализации ответов
+Создаем CategoryService чтобы не сасорять контроллер
+
+Публичные ендпоинты
+
+GET /api/categories/100?children=true
+Route::get('/categories/{category_id?}', 'Api\Category\CategoryController@getCategories');
+
+CategoryRepository:
+public function getCategory($categoryId, $withChildren)
+private function getCategoryById($categoryId, $withChildren)
+
+
+Ендпоинты админки
+
+POST /api/admin/categories/
+Route::post('/categories', 'Category\CategoryController@createCategory');
+
+PUT /api/admin/categories/
+Route::put('/categories', 'Category\CategoryController@createCategory');
+
+
 
 аутентификация - процесс залогинивания, т.е. техническая часть
 авторизация - процесс определения ролей и прав доступа

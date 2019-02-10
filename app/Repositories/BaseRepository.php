@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Interfaces\BaseRepositoryInterface;
+use App\Interfaces\EntityInterface;
 use LaravelDoctrine\ORM\Pagination\PaginatesFromRequest;
 
 
@@ -18,6 +19,15 @@ class BaseRepository extends \Doctrine\ORM\EntityRepository implements BaseRepos
     public function persist($entity) :void
     {
         $this->_em->persist($entity);
+    }
+
+    /**
+     * @param object $entity
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function merge($entity) :void
+    {
+        $this->_em->merge($entity);
     }
 
     /**
@@ -52,8 +62,12 @@ class BaseRepository extends \Doctrine\ORM\EntityRepository implements BaseRepos
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function save($entity) {
-        $this->persist($entity);
+    public function save(EntityInterface $entity) {
+        if ($entity->getId()) {
+            $this->merge($entity);
+        } else {
+            $this->persist($entity);
+        }
         $this->flush();
         $this->clear();
     }
@@ -63,9 +77,17 @@ class BaseRepository extends \Doctrine\ORM\EntityRepository implements BaseRepos
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function delete($entity) {
+    public function delete(EntityInterface $entity) {
         $this->remove($entity);
         $this->flush();
         $this->clear();
+    }
+
+    /**
+     * @param $id
+     * @return object|null
+     */
+    public function findById($id) {
+        return $this->findOneBy(['id' => $id]);
     }
 }

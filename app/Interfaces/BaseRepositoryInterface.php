@@ -11,6 +11,6 @@ namespace App\Interfaces;
 
 interface BaseRepositoryInterface
 {
-    public function save($entity);
-    public function delete($entity);
+    public function save(EntityInterface $entity);
+    public function delete(EntityInterface $entity);
 }

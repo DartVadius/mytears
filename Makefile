@@ -15,7 +15,7 @@ make-migration:
 	docker-compose exec php-cli php artisan doctrine:migrations:diff
 
 migrate:
-	docker-compose exec php-cli php artisan doctrine:migrations:migrate
+	docker-compose exec php-cli php artisan doctrine:migrations:migrate -v
 	make doc
 
 perm:

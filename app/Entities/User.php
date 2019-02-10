@@ -8,16 +8,20 @@
 
 namespace App\Entities;
 
+use App\Interfaces\EntityInterface;
+use App\Repositories\User\UserRepository;
+use App\Services\Traits\Serializer;
 use Doctrine\ORM\Mapping AS ORM;
 use DateTime;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 //use Illuminate\Validation\Rule;
+use Laravel\Passport\HasApiTokens;
 use LaravelDoctrine\Extensions\Timestamps\Timestamps;
 use LaravelDoctrine\ORM\Auth\Authenticatable;
+use LaravelDoctrine\ORM\Facades\EntityManager;
 use LaravelDoctrine\ORM\Notifications\Notifiable;
 
 
@@ -26,9 +30,9 @@ use LaravelDoctrine\ORM\Notifications\Notifiable;
  * @ORM\Table(name="users")
  * @ORM\Entity(repositoryClass="App\Repositories\User\UserRepository")
  */
-class User implements AuthenticatableContract, CanResetPasswordContract
+class User implements AuthenticatableContract, CanResetPasswordContract, EntityInterface
 {
-    use Authenticatable, CanResetPassword, Timestamps, Notifiable;
+    use Authenticatable, CanResetPassword, Timestamps, Notifiable, HasApiTokens, Serializer;
 
     const ROLE_ADMIN = 'admin';
     const ROLE_USER = 'user';
@@ -36,23 +40,7 @@ class User implements AuthenticatableContract, CanResetPasswordContract
     const STATUS_CONFIRM = '1';
     const STATUS_NO_CONFIRM = '2';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name', 'email', 'password',
-    ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password', 'remember_token', 'api_token', 'verify_code', 'refresh_token'
-    ];
+    public $serializable = ['id', 'email', 'name', 'role'];
 
     /**
      * @ORM\Id
@@ -85,22 +73,6 @@ class User implements AuthenticatableContract, CanResetPasswordContract
      */
     protected $status;
 
-//    /**
-//     * @ORM\Column(name="api_token", type="string", nullable=true, unique=true)
-//     */
-//    protected $apiToken;
-//
-//    /**
-//     * @ORM\Column(name="api_token_expired", type="datetime", nullable=true)
-//     * @var DateTime
-//     */
-//    protected $authTokenExpired;
-//
-//    /**
-//     * @ORM\Column(name="refresh_token", type="string", nullable=true, unique=true)
-//     */
-//    protected $refreshToken;
-
     /**
      * @ORM\Column(name="verify_code", type="string", nullable=true, unique=true)
      */
@@ -117,22 +89,9 @@ class User implements AuthenticatableContract, CanResetPasswordContract
     /**
      * @return mixed
      */
-    public function getAuthToken() {
-        return $this->authToken;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRefreshToken() {
-        return $this->refreshToken;
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getExpired() {
-        return $this->authTokenExpired;
+    public function getKey()
+    {
+        return $this->getId();
     }
 
     /**
@@ -168,14 +127,6 @@ class User implements AuthenticatableContract, CanResetPasswordContract
     }
 
     /**
-     * @return int
-     */
-    public function getKey()
-    {
-        return $this->getId();
-    }
-
-    /**
      * @param $role
      * @return $this
      * @throws \Exception
@@ -189,12 +140,11 @@ class User implements AuthenticatableContract, CanResetPasswordContract
         } else {
             throw new \InvalidArgumentException('Wrong value');
         }
-//        if (Rule::in([self::ROLE_USER, self::ROLE_ADMIN])) {
-//            $this->role = $role;
-//            return $this;
-//        } else {
-//            throw new \Exception('Wrong value');
-//        }
+    }
+
+    public function getRole()
+    {
+        return $this->role;
     }
 
     /**
@@ -234,6 +184,17 @@ class User implements AuthenticatableContract, CanResetPasswordContract
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;
+    }
+
+    /**
+     * @param string $userIdentifier
+     * @return User
+     */
+    public function findForPassport($userIdentifier)
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = EntityManager::getRepository(get_class($this));
+        return $userRepository->findByEmail($userIdentifier);
     }
 
 }

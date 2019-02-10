@@ -1,19 +1,33 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Resources\UserResource;
 
 Route::get('/', 'Api\HomeController@index');
+Route::get('/categories/{category_id?}', 'Api\Category\CategoryController@getCategory');
 Route::post('/register', 'Api\Auth\RegisterController@register');
-
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 Route::group(
     [
-        'middleware' => ['auth:api', 'can:admin']
+        'middleware' => ['auth:api'],
+        'namespace' => 'Api'
     ],
     function () {
-        Route::get('/admin', 'Api\Admin\AdminController@index')->name('admin');
+        Route::get('/user', function (Request $request) {
+            return new UserResource($request->user());
+        });
+    }
+);
+
+Route::group(
+    [
+        'middleware' => ['auth:api', 'can:admin'],
+        'namespace' => 'Api',
+        'prefix' => 'admin'
+    ],
+    function () {
+        Route::get('/', 'Admin\AdminController@index');
+        Route::post('/categories', 'Category\CategoryController@createCategory');
+        Route::put('/categories', 'Category\CategoryController@updateCategory');
     }
 );

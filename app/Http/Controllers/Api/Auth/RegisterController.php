@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Entities\User;
+use App\Http\Resources\UserResource;
 use App\Repositories\User\UserRepository;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Registered;
@@ -53,7 +54,7 @@ class RegisterController extends Controller
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException
      */
-    protected function register(Request $request)
+    public function register(Request $request)
     {
         $data = $request->all();
         $this->validator($request->all())->validate();
@@ -67,6 +68,6 @@ class RegisterController extends Controller
 
         event(new Registered($user));
 
-        return response()->json(['success' => 'New user was registered'], Response::HTTP_CREATED);
+        return response()->json(['response' => new UserResource($user)], Response::HTTP_CREATED);
     }
 }
