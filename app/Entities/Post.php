@@ -86,6 +86,11 @@ class Post implements EntityInterface
         return $this->id;
     }
 
+    public function toBase()
+    {
+        return $this;
+    }
+
     /**
      * @return Category
      */

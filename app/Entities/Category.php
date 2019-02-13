@@ -51,7 +51,7 @@ class Category implements EntityInterface
     /**
      * One-To-Many, Self-referencing
      * One Category has Many Categories.
-     * @ORM\OneToMany(targetEntity="Category", mappedBy="parent")
+     * @ORM\OneToMany(targetEntity="Category", mappedBy="parent", fetch="EXTRA_LAZY")
      */
     private $children   ;
 
@@ -63,7 +63,7 @@ class Category implements EntityInterface
 
     /**
      * One category has many posts. This is the inverse side.
-     * @ORM\OneToMany(targetEntity="Post", mappedBy="categories")
+     * @ORM\OneToMany(targetEntity="Post", mappedBy="categories", fetch="EXTRA_LAZY")
      */
     private $posts;
 
@@ -75,6 +75,11 @@ class Category implements EntityInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
     }
 
     /**
@@ -151,6 +156,11 @@ class Category implements EntityInterface
     {
         $this->parent = null;
 
+        return $this;
+    }
+
+    public function toBase()
+    {
         return $this;
     }
 

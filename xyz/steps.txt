@@ -318,9 +318,25 @@ mysql_upgrade -u root -p root_pass
 29.1 Категории
 
 Создаем CategoryResource для сериализации ответов
-Создаем CategoryService чтобы не сасорять контроллер
+php artisan make:resource CategoryResource
 
-Публичные ендпоинты
+Создаем CategoriesCollection для сериализации массивов объектов
+php artisan make:resource Collections/CategoriesCollection
+
+т.к. элоквет при получении набора данных возвращает не массив, а объект Collection, а
+
+для совместимости с коллекциями Laravel имплементируем в модель категории EntityInterface (имплементируем этот интерфейс и
+в другием модели, которые должны работать с коллекциями)
+
+Создаем app/Services/Category/CategoryService.php чтобы не сасорять контроллер
+
+Создаем валидаторы в Request/Category для создания и редактирования категорий
+php artisan make:request Category/UpdateCategory
+php artisan make:request Category/CreateCategory
+
+обратить внимание: в UpdateCategory в валидаторе из проверки уникальносьти исключаем наш id
+
+Публичные ресурсы
 
 GET /api/categories/100?children=true
 Route::get('/categories/{category_id?}', 'Api\Category\CategoryController@getCategories');
@@ -330,7 +346,7 @@ public function getCategory($categoryId, $withChildren)
 private function getCategoryById($categoryId, $withChildren)
 
 
-Ендпоинты админки
+Ресурсы админки
 
 POST /api/admin/categories/
 Route::post('/categories', 'Category\CategoryController@createCategory');

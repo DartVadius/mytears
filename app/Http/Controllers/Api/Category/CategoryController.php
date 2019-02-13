@@ -3,41 +3,48 @@
 namespace App\Http\Controllers\Api\Category;
 
 use App\Entities\Category;
+use App\Http\Requests\Category\CreateCategory;
+use App\Http\Requests\Category\UpdateCategory;
 use App\Http\Resources\CategoryResource;
+use App\Http\Resources\Collections\CategoriesCollection;
 use App\Services\Category\CategoryService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
-use phpDocumentor\Reflection\Types\Boolean;
+use Illuminate\Support\Collection;
 
 class CategoryController extends Controller
 {
     private $categoryService;
-    private $request;
 
-    public function __construct(CategoryService $categoryService, Request $request)
+    public function __construct(CategoryService $categoryService)
     {
         $this->categoryService = $categoryService;
-        $this->request = $request;
     }
 
-    public function getCategory($category_id = null)
+    public function getCategory(Request $request, $category_id = null)
     {
-        $result = $this->categoryService->getCategory($category_id, $this->request->get('children'));
-        return response()->json(['response' => $result], Response::HTTP_OK);
+        if ($category_id) {
+            $result = $this->categoryService->getCategory($category_id, $request->get('children'));
+            return response()->json(['response' => new CategoryResource($result)], Response::HTTP_OK);
+        }
+        $result = $this->categoryService->getCategories();
+        // todo коллекции под доктрину
+        $collection = new Collection($result);
+        return response()->json(['response' => CategoriesCollection::collection($collection)], Response::HTTP_OK);
     }
 
-    public function createCategory()
+    public function createCategory(CreateCategory $request)
     {
-        $data = $this->request->all();
-        $category = $this->categoryService->createEntity($data);
+        $validatedData = $request->validated();
+        $category = $this->categoryService->createEntity($validatedData);
         return response()->json(['response' => new CategoryResource($category)], Response::HTTP_OK);
     }
 
-    public function updateCategory()
+    public function updateCategory(UpdateCategory $request)
     {
-        $data = $this->request->all();
-        $category = $this->categoryService->updateEntity($data);
+        $validatedData = $request->validated();
+        $category = $this->categoryService->updateEntity($validatedData);
         return response()->json(['response' => new CategoryResource($category)], Response::HTTP_OK);
     }
 }

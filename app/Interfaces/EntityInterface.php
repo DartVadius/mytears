@@ -12,4 +12,5 @@ namespace App\Interfaces;
 interface EntityInterface
 {
     public function getId();
+    public function toBase();
 }
