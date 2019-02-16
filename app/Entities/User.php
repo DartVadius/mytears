@@ -86,6 +86,11 @@ class User implements AuthenticatableContract, CanResetPasswordContract, EntityI
         return $this->id;
     }
 
+    public function toBase()
+    {
+        return $this;
+    }
+
     /**
      * @return mixed
      */

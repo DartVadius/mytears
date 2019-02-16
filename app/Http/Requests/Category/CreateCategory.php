@@ -19,7 +19,7 @@ class CreateCategory extends FormRequest
             'meta_title' => 'max:255',
             'meta_keywords' => 'max:255',
             'meta_description' => 'max:255',
-            'parent_id' => 'integer|max:10',
+            'parent_id' => 'integer',
         ];
     }
 }

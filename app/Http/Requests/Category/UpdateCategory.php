@@ -16,12 +16,12 @@ class UpdateCategory extends FormRequest
     {
         return [
             'id' => 'required|max:10',
-            'title' => 'string|required|max:255unique:App\Entities\Category,title,' . $this->get('id'),
+            'title' => 'string|required|max:255|unique:App\Entities\Category,title,' . $this->get('id'),
             'slug' => 'string|nullable|max:255',
             'meta_title' => 'max:255',
             'meta_keywords' => 'max:255',
             'meta_description' => 'max:255',
-            'parent_id' => 'integer|max:10|nullable',
+            'parent_id' => 'integer|nullable',
         ];
     }
 }

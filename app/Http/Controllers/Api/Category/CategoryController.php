@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\Category;
 
-use App\Entities\Category;
 use App\Http\Requests\Category\CreateCategory;
 use App\Http\Requests\Category\UpdateCategory;
 use App\Http\Resources\CategoryResource;
@@ -26,11 +25,17 @@ class CategoryController extends Controller
     {
         if ($category_id) {
             $result = $this->categoryService->getCategory($category_id, $request->get('children'));
+            if ($request->get('children') === 'true') {
+                $collection = new Collection($result);
+
+                return response()->json(['response' => CategoriesCollection::collection($collection)], Response::HTTP_OK);
+            }
+
             return response()->json(['response' => new CategoryResource($result)], Response::HTTP_OK);
         }
         $result = $this->categoryService->getCategories();
-        // todo коллекции под доктрину
         $collection = new Collection($result);
+
         return response()->json(['response' => CategoriesCollection::collection($collection)], Response::HTTP_OK);
     }
 

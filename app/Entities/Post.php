@@ -26,10 +26,14 @@ use phpDocumentor\Reflection\Types\Integer;
 class Post implements EntityInterface
 {
 
+    const PUBLISHED_TRUE = 1;
+    const PUBLISHED_FALSE = 0;
+
     use Timestamps, MetaFields, Sluggable;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="products")
+     * Many Posts have One Parent Category.
+     * @ORM\ManyToOne(targetEntity="Category", inversedBy="posts")
      */
     private $category;
 

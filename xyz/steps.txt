@@ -323,8 +323,7 @@ php artisan make:resource CategoryResource
 Создаем CategoriesCollection для сериализации массивов объектов
 php artisan make:resource Collections/CategoriesCollection
 
-т.к. элоквет при получении набора данных возвращает не массив, а объект Collection, а
-
+т.к. элоквет при получении набора данных возвращает не массив, а объект Collection,
 для совместимости с коллекциями Laravel имплементируем в модель категории EntityInterface (имплементируем этот интерфейс и
 в другием модели, которые должны работать с коллекциями)
 
@@ -336,23 +335,43 @@ php artisan make:request Category/CreateCategory
 
 обратить внимание: в UpdateCategory в валидаторе из проверки уникальносьти исключаем наш id
 
+CategoryRepository:
+public function getCategory($categoryId, $withChildren)
+public function getCategories()
+
 Публичные ресурсы
 
 GET /api/categories/100?children=true
 Route::get('/categories/{category_id?}', 'Api\Category\CategoryController@getCategories');
 
-CategoryRepository:
-public function getCategory($categoryId, $withChildren)
-private function getCategoryById($categoryId, $withChildren)
+Ресурсы админки
 
+POST /api/categories
+Route::post('/categories', 'Category\CategoryController@createCategory');
+
+PUT /api/categories
+Route::put('/categories', 'Category\CategoryController@createCategory');
+
+29.2 Посты
+
+Создаем ресурсы, коллекции, реквесты аналогично категориям
+
+Публичные ресурсы
+
+GET /api/posts?category=1&tag=1&page=1&limit=25
+Route::get('/posts/{post_id?}', 'Post\PostController@getPost');
 
 Ресурсы админки
 
-POST /api/admin/categories/
-Route::post('/categories', 'Category\CategoryController@createCategory');
+POST /api/posts
+Route::post('/posts', 'Post\PostController@createPost');
 
-PUT /api/admin/categories/
-Route::put('/categories', 'Category\CategoryController@createCategory');
+PUT /api/posts
+Route::put('/posts', 'Post\PostController@updatePost');
+
+
+
+
 
 
 

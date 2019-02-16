@@ -3,10 +3,24 @@
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
 
-Route::get('/', 'Api\HomeController@index');
-Route::get('/categories/{category_id?}', 'Api\Category\CategoryController@getCategory');
-Route::post('/register', 'Api\Auth\RegisterController@register');
+/**
+ * public resources
+ */
+Route::group(
+    [
+        'namespace' => 'Api',
+    ],
+    function () {
+        Route::get('/', 'HomeController@index');
+        Route::post('/register', 'Auth\RegisterController@register');
+        Route::get('/categories/{category_id?}', 'Category\CategoryController@getCategory');
+        Route::get('/posts/{post_id?}', 'Post\PostController@getPost');
+    }
+);
 
+/**
+ * authorized resources
+ */
 Route::group(
     [
         'middleware' => ['auth:api'],
@@ -19,15 +33,20 @@ Route::group(
     }
 );
 
+/**
+ * admin resources
+ */
 Route::group(
     [
         'middleware' => ['auth:api', 'can:admin'],
         'namespace' => 'Api',
-        'prefix' => 'admin'
+//        'prefix' => 'admin'
     ],
     function () {
         Route::get('/', 'Admin\AdminController@index');
         Route::post('/categories', 'Category\CategoryController@createCategory');
         Route::put('/categories', 'Category\CategoryController@updateCategory');
+        Route::post('/posts', 'Post\PostController@createPost');
+        Route::put('/posts', 'Post\PostController@updatePost');
     }
 );

@@ -83,7 +83,7 @@ class CategoryService
         try {
             $this->categoryRepository->save($category);
         } catch (\Exception $exception) {
-            abort(Response::HTTP_CONFLICT, $exception->getMessage());
+            abort(Response::HTTP_EXPECTATION_FAILED, $exception->getMessage());
         }
         return $category;
     }
