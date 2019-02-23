@@ -10,7 +10,6 @@ namespace App\Entities;
 
 use App\Interfaces\EntityInterface;
 use App\Services\Traits\MetaFields;
-use App\Services\Traits\Serializer;
 use App\Services\Traits\Sluggable;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -28,9 +27,7 @@ use LaravelDoctrine\Extensions\Timestamps\Timestamps;
 class Category implements EntityInterface
 {
 
-    use Timestamps, MetaFields, Sluggable, Serializer;
-
-    private $serializable = ['id', 'title', 'slug', 'metaTitle', 'metaKeywords', 'metaDescription', 'createdAt', 'updatedAt', 'deletedAt'];
+    use Timestamps, MetaFields, Sluggable;
 
     /**
      * @ORM\Id
@@ -63,7 +60,7 @@ class Category implements EntityInterface
 
     /**
      * One category has many posts. This is the inverse side.
-     * @ORM\OneToMany(targetEntity="Post", mappedBy="categories", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Post", mappedBy="category", fetch="EXTRA_LAZY")
      */
     private $posts;
 
@@ -94,27 +91,41 @@ class Category implements EntityInterface
      * @param Post $post
      * @return Category
      */
-    public function addPost(Post $post): self
+    public function addPost(Post $post)
     {
-        $this->posts[] = $post;
+        if ($this->posts->contains($post)) {
+
+            return $this;
+        }
+        $this->posts->add($post);
+        $post->setCategory($this);
 
         return $this;
     }
 
     /**
-     * @param $key
-     * @return Category
+     * @param Post $post
+     * @return $this
      */
-    public function removePost($key): self
+    public function removePost($post)
     {
-        $this->posts->remove($key);
+        if (!$this->posts->contains($post)) {
+
+            return $this;
+        }
+        $this->posts->removeElement($post);
+        $post->removeCategory();
 
         return $this;
     }
 
     public function addChildren(Category $category)
     {
-        $this->children[] = $category;
+        if ($this->children->contains($category)) {
+
+            return $this;
+        }
+        $this->children->add($category);
         $category->setParent($this);
 
         return $this;
@@ -162,6 +173,33 @@ class Category implements EntityInterface
     public function toBase()
     {
         return $this;
+    }
+
+    public function all()
+    {
+        $response = [];
+        $response['id'] = $this->getId();
+        $response['title'] = $this->getTitle();
+        $response['slug'] = $this->getSlug();
+        $response['metaTitle'] = $this->getMetaTitle();
+        $response['metaKeywords'] = $this->getMetaKeywords();
+        $response['metaDescription'] = $this->getMetaDescription();
+        $response['createdAt'] = $this->getCreatedAt();
+        $response['updatedAt'] = $this->getUpdatedAt();
+        $response['deletedAt'] = $this->getDeletedAt();
+
+        $response['parent_id'] = null;
+        if ($parent = $this->getParent()) {
+            $response['parent_id'] = $parent->getId();
+        }
+        return $response;
+    }
+
+    /**
+     * @return string
+     */
+    public function toJson() {
+        return \GuzzleHttp\json_encode($this->all());
     }
 
 }

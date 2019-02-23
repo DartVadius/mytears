@@ -16,7 +16,7 @@ class CategoryRepository extends BaseRepository
      * @param $withChildren
      * @return array|object|null
      */
-    public function getCategory($categoryId, $withChildren)
+    public function getCategory($categoryId, $withChildren = null)
     {
         if (!$result = $this->findById($categoryId))
         {

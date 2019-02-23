@@ -12,6 +12,7 @@ use App\Interfaces\EntityInterface;
 use App\Services\Traits\MetaFields;
 use App\Services\Traits\Sluggable;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping AS ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use LaravelDoctrine\Extensions\Timestamps\Timestamps;
@@ -34,6 +35,7 @@ class Post implements EntityInterface
     /**
      * Many Posts have One Parent Category.
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="posts")
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=true, unique=false)
      */
     private $category;
 
@@ -45,14 +47,6 @@ class Post implements EntityInterface
     private $id;
 
     /**
-     * Many posts have one category. This is the owning side.
-     * @var integer
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="posts")
-     * @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=true, unique=false)
-     */
-    private $categoryId;
-
-    /**
      * @var DateTime
      * @ORM\Column(name="deleted_at", type="datetime", nullable=true)
      */
@@ -62,25 +56,46 @@ class Post implements EntityInterface
      * @var string
      * @ORM\Column(name="short_text", type="text", nullable=true)
      */
-    public $shortText;
+    private $shortText;
 
     /**
      * @var string
      * @ORM\Column(name="full_text", type="text", nullable=false)
      */
-    public $fullText;
+    private $fullText;
 
     /**
      * @var string
-     * @ORM\Column(type="smallint", nullable=false, length=1, options={"unsigned":true, "default":0})
+     * @ORM\Column(name="publish", type="smallint", nullable=false, length=1, options={"unsigned":true, "default":0})
      */
-    public $publish;
+    private $publish;
 
     /**
      * @var integer
-     * @ORM\Column(type="smallint", nullable=true, length=10)
+     * @ORM\Column(name="post_order", type="smallint", nullable=true, length=10)
      */
-    public $order;
+    private $order;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection|Tag[]
+     *
+     * @ORM\ManyToMany(targetEntity="Tag", inversedBy="posts", fetch="EXTRA_LAZY")
+     * @ORM\JoinTable(
+     *  name="posts_tags",
+     *  joinColumns={
+     *      @ORM\JoinColumn(name="post_id", referencedColumnName="id")
+     *  },
+     *  inverseJoinColumns={
+     *      @ORM\JoinColumn(name="tag_id", referencedColumnName="id")
+     *  }
+     * )
+     */
+    private $tags;
+
+    public function __construct()
+    {
+        $this->tags = new ArrayCollection();
+    }
 
     /**
      * @return integer
@@ -95,10 +110,58 @@ class Post implements EntityInterface
         return $this;
     }
 
+    public function getShortText()
+    {
+        return $this->shortText;
+    }
+
+    public function setShortText($text)
+    {
+        $this->shortText = $text;
+
+        return $this;
+    }
+
+    public function getFullText()
+    {
+        return $this->fullText;
+    }
+
+    public function setFullText($text)
+    {
+        $this->fullText = $text;
+
+        return $this;
+    }
+
+    public function getPublish()
+    {
+        return $this->publish;
+    }
+
+    public function setPublish($publish)
+    {
+        $this->publish = $publish;
+
+        return $this;
+    }
+
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    public function setOrder($order)
+    {
+        $this->order = $order;
+
+        return $this;
+    }
+
     /**
-     * @return Category
+     * @return Category|null
      */
-    public function getCategory(): Category
+    public function getCategory()
     {
         return $this->category;
     }
@@ -107,11 +170,104 @@ class Post implements EntityInterface
      * @param Category $category
      * @return Post
      */
-    public function setCategory(Category $category): self
+    public function setCategory(Category $category)
     {
         $this->category = $category;
 
         return $this;
+    }
+
+    public function removeCategory()
+    {
+        $this->category = null;
+
+        return $this;
+    }
+
+    /**
+     * @return Tag[]|ArrayCollection|\Doctrine\Common\Collections\Collection
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param Tag $tag
+     * @return $this
+     */
+    public function addTag(Tag $tag)
+    {
+        if ($this->tags->contains($tag)) {
+
+            return $this;
+        }
+        $this->tags->add($tag);
+        $tag->addPost($this);
+
+        return $this;
+    }
+
+    /**
+     * @param Tag $tag
+     * @return $this
+     */
+    public function removeTag(Tag $tag)
+    {
+        if (!$this->tags->contains($tag)) {
+
+            return $this;
+        }
+        $this->tags->removeElement($tag);
+        $tag->removePost($this);
+
+        return $this;
+    }
+
+    public function removeAllTags()
+    {
+        $this->tags->clear();
+
+        return $this;
+    }
+
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    public function all()
+    {
+        $response = [];
+        $response['id'] = $this->getId();
+        $response['title'] = $this->getTitle();
+        $response['slug'] = $this->getSlug();
+        $response['short_text'] = $this->getShortText();
+        $response['full_text'] = $this->getFullText();
+        $response['metaTitle'] = $this->getMetaTitle();
+        $response['metaKeywords'] = $this->getMetaKeywords();
+        $response['metaDescription'] = $this->getMetaDescription();
+        $response['createdAt'] = $this->getCreatedAt();
+        $response['updatedAt'] = $this->getUpdatedAt();
+        $response['deletedAt'] = $this->getDeletedAt();
+        $response['publish'] = $this->getPublish();
+        $response['order'] = $this->getOrder();
+        $response['tags'] = [];
+        foreach ($this->tags as $tag) {
+            $tags[] = $tag->getId();
+        }
+        $response['category_id'] = null;
+        if ($parent = $this->getCategory()) {
+            $response['category_id'] = $parent->getId();
+        }
+        return $response;
+    }
+
+    /**
+     * @return string
+     */
+    public function toJson() {
+        return \GuzzleHttp\json_encode($this->all());
     }
 
 }

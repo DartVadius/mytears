@@ -16,11 +16,11 @@ class UpdateCategory extends FormRequest
     {
         return [
             'id' => 'required|max:10',
-            'title' => 'string|required|max:255|unique:App\Entities\Category,title,' . $this->get('id'),
-            'slug' => 'string|nullable|max:255',
-            'meta_title' => 'max:255',
-            'meta_keywords' => 'max:255',
-            'meta_description' => 'max:255',
+            'title' => 'string|max:255|unique:App\Entities\Category,title,' . $this->get('id'),
+            'slug' => 'string|max:255|max:255|unique:App\Entities\Category,slug,' . $this->get('id'),
+            'meta_title' => 'max:255|nullable',
+            'meta_keywords' => 'max:255|nullable',
+            'meta_description' => 'max:255|nullable',
             'parent_id' => 'integer|nullable',
         ];
     }

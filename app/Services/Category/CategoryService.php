@@ -53,28 +53,44 @@ class CategoryService
         {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong category Id');
         }
-        $category->setTitle($data['title'])
-            ->setMetaTitle($data['meta_title'])
-            ->setMetaKeywords($data['meta_keywords'])
-            ->setMetaDescription($data['meta_description']);
+
+        if (array_key_exists('title', $data)) {
+            $category->setTitle($data['title']);
+        }
         if (array_key_exists('slug', $data)) {
             $category->setSlug($data['slug']);
         }
-        $category->removeParent();
-        if (array_key_exists('parent_id', $data) && $data['parent_id']) {
+        if (array_key_exists('meta_title', $data)) {
+            $category->setMetaTitle($data['meta_title']);
+        }
+        if (array_key_exists('meta_keywords', $data)) {
+            $category->setMetaKeywords($data['meta_keywords']);
+        }
+        if (array_key_exists('meta_description', $data)) {
+            $category->setMetaDescription($data['meta_description']);
+        }
+        if (array_key_exists('parent_id', $data)) {
             $category = $this->updateParent($data['parent_id'], $category);
         }
         return $this->save($category);
     }
 
+    /**
+     * @param $parentId
+     * @param $category Category
+     * @return mixed
+     */
     private function updateParent($parentId, $category)
     {
+        if (!$parentId) {
+            return $category->removeParent();
+        }
         /**@var $parentCategory Category **/
         if (!$parentCategory = $this->getCategory($parentId, 'false'))
         {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong parent Id');
         }
-        $parentCategory->addChildren($category);
+        $category->setParent($parentCategory);
         return $category;
     }
 

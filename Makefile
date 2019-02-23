@@ -1,8 +1,8 @@
 docker-up:
-	docker-compose up -d
+	sudo docker-compose up -d
 
 docker-down:
-	docker-compose down
+	sudo docker-compose down
 
 docker-build:
 	sudo chown ${USER}:${USER} storage -R

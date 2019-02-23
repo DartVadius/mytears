@@ -5,13 +5,14 @@ namespace PHPSTORM_META {
 
    /**
     * PhpStorm Meta file, to provide autocomplete information for PhpStorm
-    * Generated on 2019-01-07 12:11:28.
+    * Generated on 2019-01-30 19:01:48.
     *
     * @author Barry vd. Heuvel <barryvdh@gmail.com>
     * @see https://github.com/barryvdh/laravel-ide-helper
     */
     override(new \Illuminate\Contracts\Container\Container, map([
         '' => '@',
+        'App\Repositories\User\UserRepository' => \App\Repositories\User\UserRepository::class,
         'Barryvdh\Debugbar\LaravelDebugbar' => \Barryvdh\Debugbar\LaravelDebugbar::class,
         'Doctrine\ORM\Mapping\ClassMetadataFactory' => \Doctrine\ORM\Mapping\ClassMetadataFactory::class,
         'Illuminate\Broadcasting\BroadcastManager' => \Illuminate\Broadcasting\BroadcastManager::class,
@@ -38,8 +39,11 @@ namespace PHPSTORM_META {
         'NunoMaduro\Collision\Contracts\Adapters\Phpunit\Listener' => \NunoMaduro\Collision\Adapters\Phpunit\Listener::class,
         'NunoMaduro\Collision\Contracts\Provider' => \NunoMaduro\Collision\Provider::class,
         'Psr\Http\Message\ResponseInterface' => \Zend\Diactoros\Response::class,
+        'Psr\Http\Message\ServerRequestInterface' => \Zend\Diactoros\ServerRequest::class,
         'auth' => \Illuminate\Auth\AuthManager::class,
+        'auth.driver' => \Illuminate\Auth\SessionGuard::class,
         'auth.password' => \LaravelDoctrine\ORM\Auth\Passwords\PasswordBrokerManager::class,
+        'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
         'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
         'cache' => \Illuminate\Cache\CacheManager::class,
         'cache.store' => \Illuminate\Cache\Repository::class,
@@ -121,6 +125,8 @@ namespace PHPSTORM_META {
         'db' => \Illuminate\Database\DatabaseManager::class,
         'db.connection' => \Illuminate\Database\MySqlConnection::class,
         'db.factory' => \Illuminate\Database\Connectors\ConnectionFactory::class,
+        'doctrine.connections.default' => \Doctrine\DBAL\Connection::class,
+        'doctrine.managers.default' => \Doctrine\ORM\EntityManager::class,
         'em' => \Doctrine\ORM\EntityManager::class,
         'encrypter' => \Illuminate\Encryption\Encrypter::class,
         'events' => \Illuminate\Events\Dispatcher::class,
@@ -159,6 +165,7 @@ namespace PHPSTORM_META {
     ]));
     override(\Illuminate\Contracts\Container\Container::make(0), map([
         '' => '@',
+        'App\Repositories\User\UserRepository' => \App\Repositories\User\UserRepository::class,
         'Barryvdh\Debugbar\LaravelDebugbar' => \Barryvdh\Debugbar\LaravelDebugbar::class,
         'Doctrine\ORM\Mapping\ClassMetadataFactory' => \Doctrine\ORM\Mapping\ClassMetadataFactory::class,
         'Illuminate\Broadcasting\BroadcastManager' => \Illuminate\Broadcasting\BroadcastManager::class,
@@ -185,8 +192,11 @@ namespace PHPSTORM_META {
         'NunoMaduro\Collision\Contracts\Adapters\Phpunit\Listener' => \NunoMaduro\Collision\Adapters\Phpunit\Listener::class,
         'NunoMaduro\Collision\Contracts\Provider' => \NunoMaduro\Collision\Provider::class,
         'Psr\Http\Message\ResponseInterface' => \Zend\Diactoros\Response::class,
+        'Psr\Http\Message\ServerRequestInterface' => \Zend\Diactoros\ServerRequest::class,
         'auth' => \Illuminate\Auth\AuthManager::class,
+        'auth.driver' => \Illuminate\Auth\SessionGuard::class,
         'auth.password' => \LaravelDoctrine\ORM\Auth\Passwords\PasswordBrokerManager::class,
+        'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
         'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
         'cache' => \Illuminate\Cache\CacheManager::class,
         'cache.store' => \Illuminate\Cache\Repository::class,
@@ -268,6 +278,8 @@ namespace PHPSTORM_META {
         'db' => \Illuminate\Database\DatabaseManager::class,
         'db.connection' => \Illuminate\Database\MySqlConnection::class,
         'db.factory' => \Illuminate\Database\Connectors\ConnectionFactory::class,
+        'doctrine.connections.default' => \Doctrine\DBAL\Connection::class,
+        'doctrine.managers.default' => \Doctrine\ORM\EntityManager::class,
         'em' => \Doctrine\ORM\EntityManager::class,
         'encrypter' => \Illuminate\Encryption\Encrypter::class,
         'events' => \Illuminate\Events\Dispatcher::class,
@@ -306,6 +318,7 @@ namespace PHPSTORM_META {
     ]));
     override(\Illuminate\Contracts\Container\Container::makeWith(0), map([
         '' => '@',
+        'App\Repositories\User\UserRepository' => \App\Repositories\User\UserRepository::class,
         'Barryvdh\Debugbar\LaravelDebugbar' => \Barryvdh\Debugbar\LaravelDebugbar::class,
         'Doctrine\ORM\Mapping\ClassMetadataFactory' => \Doctrine\ORM\Mapping\ClassMetadataFactory::class,
         'Illuminate\Broadcasting\BroadcastManager' => \Illuminate\Broadcasting\BroadcastManager::class,
@@ -332,8 +345,11 @@ namespace PHPSTORM_META {
         'NunoMaduro\Collision\Contracts\Adapters\Phpunit\Listener' => \NunoMaduro\Collision\Adapters\Phpunit\Listener::class,
         'NunoMaduro\Collision\Contracts\Provider' => \NunoMaduro\Collision\Provider::class,
         'Psr\Http\Message\ResponseInterface' => \Zend\Diactoros\Response::class,
+        'Psr\Http\Message\ServerRequestInterface' => \Zend\Diactoros\ServerRequest::class,
         'auth' => \Illuminate\Auth\AuthManager::class,
+        'auth.driver' => \Illuminate\Auth\SessionGuard::class,
         'auth.password' => \LaravelDoctrine\ORM\Auth\Passwords\PasswordBrokerManager::class,
+        'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
         'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
         'cache' => \Illuminate\Cache\CacheManager::class,
         'cache.store' => \Illuminate\Cache\Repository::class,
@@ -415,6 +431,8 @@ namespace PHPSTORM_META {
         'db' => \Illuminate\Database\DatabaseManager::class,
         'db.connection' => \Illuminate\Database\MySqlConnection::class,
         'db.factory' => \Illuminate\Database\Connectors\ConnectionFactory::class,
+        'doctrine.connections.default' => \Doctrine\DBAL\Connection::class,
+        'doctrine.managers.default' => \Doctrine\ORM\EntityManager::class,
         'em' => \Doctrine\ORM\EntityManager::class,
         'encrypter' => \Illuminate\Encryption\Encrypter::class,
         'events' => \Illuminate\Events\Dispatcher::class,
@@ -453,6 +471,7 @@ namespace PHPSTORM_META {
     ]));
     override(\App::make(0), map([
         '' => '@',
+        'App\Repositories\User\UserRepository' => \App\Repositories\User\UserRepository::class,
         'Barryvdh\Debugbar\LaravelDebugbar' => \Barryvdh\Debugbar\LaravelDebugbar::class,
         'Doctrine\ORM\Mapping\ClassMetadataFactory' => \Doctrine\ORM\Mapping\ClassMetadataFactory::class,
         'Illuminate\Broadcasting\BroadcastManager' => \Illuminate\Broadcasting\BroadcastManager::class,
@@ -479,8 +498,11 @@ namespace PHPSTORM_META {
         'NunoMaduro\Collision\Contracts\Adapters\Phpunit\Listener' => \NunoMaduro\Collision\Adapters\Phpunit\Listener::class,
         'NunoMaduro\Collision\Contracts\Provider' => \NunoMaduro\Collision\Provider::class,
         'Psr\Http\Message\ResponseInterface' => \Zend\Diactoros\Response::class,
+        'Psr\Http\Message\ServerRequestInterface' => \Zend\Diactoros\ServerRequest::class,
         'auth' => \Illuminate\Auth\AuthManager::class,
+        'auth.driver' => \Illuminate\Auth\SessionGuard::class,
         'auth.password' => \LaravelDoctrine\ORM\Auth\Passwords\PasswordBrokerManager::class,
+        'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
         'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
         'cache' => \Illuminate\Cache\CacheManager::class,
         'cache.store' => \Illuminate\Cache\Repository::class,
@@ -562,6 +584,8 @@ namespace PHPSTORM_META {
         'db' => \Illuminate\Database\DatabaseManager::class,
         'db.connection' => \Illuminate\Database\MySqlConnection::class,
         'db.factory' => \Illuminate\Database\Connectors\ConnectionFactory::class,
+        'doctrine.connections.default' => \Doctrine\DBAL\Connection::class,
+        'doctrine.managers.default' => \Doctrine\ORM\EntityManager::class,
         'em' => \Doctrine\ORM\EntityManager::class,
         'encrypter' => \Illuminate\Encryption\Encrypter::class,
         'events' => \Illuminate\Events\Dispatcher::class,
@@ -600,6 +624,7 @@ namespace PHPSTORM_META {
     ]));
     override(\App::makeWith(0), map([
         '' => '@',
+        'App\Repositories\User\UserRepository' => \App\Repositories\User\UserRepository::class,
         'Barryvdh\Debugbar\LaravelDebugbar' => \Barryvdh\Debugbar\LaravelDebugbar::class,
         'Doctrine\ORM\Mapping\ClassMetadataFactory' => \Doctrine\ORM\Mapping\ClassMetadataFactory::class,
         'Illuminate\Broadcasting\BroadcastManager' => \Illuminate\Broadcasting\BroadcastManager::class,
@@ -626,8 +651,11 @@ namespace PHPSTORM_META {
         'NunoMaduro\Collision\Contracts\Adapters\Phpunit\Listener' => \NunoMaduro\Collision\Adapters\Phpunit\Listener::class,
         'NunoMaduro\Collision\Contracts\Provider' => \NunoMaduro\Collision\Provider::class,
         'Psr\Http\Message\ResponseInterface' => \Zend\Diactoros\Response::class,
+        'Psr\Http\Message\ServerRequestInterface' => \Zend\Diactoros\ServerRequest::class,
         'auth' => \Illuminate\Auth\AuthManager::class,
+        'auth.driver' => \Illuminate\Auth\SessionGuard::class,
         'auth.password' => \LaravelDoctrine\ORM\Auth\Passwords\PasswordBrokerManager::class,
+        'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
         'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
         'cache' => \Illuminate\Cache\CacheManager::class,
         'cache.store' => \Illuminate\Cache\Repository::class,
@@ -709,6 +737,8 @@ namespace PHPSTORM_META {
         'db' => \Illuminate\Database\DatabaseManager::class,
         'db.connection' => \Illuminate\Database\MySqlConnection::class,
         'db.factory' => \Illuminate\Database\Connectors\ConnectionFactory::class,
+        'doctrine.connections.default' => \Doctrine\DBAL\Connection::class,
+        'doctrine.managers.default' => \Doctrine\ORM\EntityManager::class,
         'em' => \Doctrine\ORM\EntityManager::class,
         'encrypter' => \Illuminate\Encryption\Encrypter::class,
         'events' => \Illuminate\Events\Dispatcher::class,
@@ -747,6 +777,7 @@ namespace PHPSTORM_META {
     ]));
     override(\app(0), map([
         '' => '@',
+        'App\Repositories\User\UserRepository' => \App\Repositories\User\UserRepository::class,
         'Barryvdh\Debugbar\LaravelDebugbar' => \Barryvdh\Debugbar\LaravelDebugbar::class,
         'Doctrine\ORM\Mapping\ClassMetadataFactory' => \Doctrine\ORM\Mapping\ClassMetadataFactory::class,
         'Illuminate\Broadcasting\BroadcastManager' => \Illuminate\Broadcasting\BroadcastManager::class,
@@ -773,8 +804,11 @@ namespace PHPSTORM_META {
         'NunoMaduro\Collision\Contracts\Adapters\Phpunit\Listener' => \NunoMaduro\Collision\Adapters\Phpunit\Listener::class,
         'NunoMaduro\Collision\Contracts\Provider' => \NunoMaduro\Collision\Provider::class,
         'Psr\Http\Message\ResponseInterface' => \Zend\Diactoros\Response::class,
+        'Psr\Http\Message\ServerRequestInterface' => \Zend\Diactoros\ServerRequest::class,
         'auth' => \Illuminate\Auth\AuthManager::class,
+        'auth.driver' => \Illuminate\Auth\SessionGuard::class,
         'auth.password' => \LaravelDoctrine\ORM\Auth\Passwords\PasswordBrokerManager::class,
+        'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
         'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
         'cache' => \Illuminate\Cache\CacheManager::class,
         'cache.store' => \Illuminate\Cache\Repository::class,
@@ -856,6 +890,8 @@ namespace PHPSTORM_META {
         'db' => \Illuminate\Database\DatabaseManager::class,
         'db.connection' => \Illuminate\Database\MySqlConnection::class,
         'db.factory' => \Illuminate\Database\Connectors\ConnectionFactory::class,
+        'doctrine.connections.default' => \Doctrine\DBAL\Connection::class,
+        'doctrine.managers.default' => \Doctrine\ORM\EntityManager::class,
         'em' => \Doctrine\ORM\EntityManager::class,
         'encrypter' => \Illuminate\Encryption\Encrypter::class,
         'events' => \Illuminate\Events\Dispatcher::class,
@@ -894,6 +930,7 @@ namespace PHPSTORM_META {
     ]));
     override(\resolve(0), map([
         '' => '@',
+        'App\Repositories\User\UserRepository' => \App\Repositories\User\UserRepository::class,
         'Barryvdh\Debugbar\LaravelDebugbar' => \Barryvdh\Debugbar\LaravelDebugbar::class,
         'Doctrine\ORM\Mapping\ClassMetadataFactory' => \Doctrine\ORM\Mapping\ClassMetadataFactory::class,
         'Illuminate\Broadcasting\BroadcastManager' => \Illuminate\Broadcasting\BroadcastManager::class,
@@ -920,8 +957,11 @@ namespace PHPSTORM_META {
         'NunoMaduro\Collision\Contracts\Adapters\Phpunit\Listener' => \NunoMaduro\Collision\Adapters\Phpunit\Listener::class,
         'NunoMaduro\Collision\Contracts\Provider' => \NunoMaduro\Collision\Provider::class,
         'Psr\Http\Message\ResponseInterface' => \Zend\Diactoros\Response::class,
+        'Psr\Http\Message\ServerRequestInterface' => \Zend\Diactoros\ServerRequest::class,
         'auth' => \Illuminate\Auth\AuthManager::class,
+        'auth.driver' => \Illuminate\Auth\SessionGuard::class,
         'auth.password' => \LaravelDoctrine\ORM\Auth\Passwords\PasswordBrokerManager::class,
+        'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
         'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
         'cache' => \Illuminate\Cache\CacheManager::class,
         'cache.store' => \Illuminate\Cache\Repository::class,
@@ -1003,6 +1043,8 @@ namespace PHPSTORM_META {
         'db' => \Illuminate\Database\DatabaseManager::class,
         'db.connection' => \Illuminate\Database\MySqlConnection::class,
         'db.factory' => \Illuminate\Database\Connectors\ConnectionFactory::class,
+        'doctrine.connections.default' => \Doctrine\DBAL\Connection::class,
+        'doctrine.managers.default' => \Doctrine\ORM\EntityManager::class,
         'em' => \Doctrine\ORM\EntityManager::class,
         'encrypter' => \Illuminate\Encryption\Encrypter::class,
         'events' => \Illuminate\Events\Dispatcher::class,

@@ -14,20 +14,6 @@ class CategoriesCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        $response['id'] = $this->getId();
-        $response['title'] = $this->getTitle();
-        $response['slug'] = $this->getSlug();
-        $response['metaTitle'] = $this->getMetaTitle();
-        $response['metaKeywords'] = $this->getMetaKeywords();
-        $response['metaDescription'] = $this->getMetaDescription();
-        $response['createdAt'] = $this->getCreatedAt();
-        $response['updatedAt'] = $this->getUpdatedAt();
-        $response['deletedAt'] = $this->getDeletedAt();
-
-        $response['parent_id'] = null;
-        if ($parent = $this->getParent()) {
-            $response['parent_id'] = $parent->getId();
-        }
-        return $response;
+        return $this->all();
     }
 }

@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Entities\Category;
 use App\Entities\Post;
+use App\Entities\Tag;
 use App\Entities\User;
 use App\Repositories\Category\CategoryRepository;
+use App\Repositories\Tag\TagRepository;
 use App\Repositories\Post\PostRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Support\ServiceProvider;
@@ -54,6 +56,12 @@ class AppServiceProvider extends ServiceProvider
             return new CategoryRepository(
                 $app['em'],
                 $app['em']->getClassMetaData(Category::class)
+            );
+        });
+        $this->app->bind(TagRepository::class, function($app) {
+            return new TagRepository(
+                $app['em'],
+                $app['em']->getClassMetaData(Tag::class)
             );
         });
     }

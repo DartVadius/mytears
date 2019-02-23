@@ -30,6 +30,7 @@ class PostController extends Controller
     {
         $validatedData = $request->validated();
         $post = $this->postService->createEntity($validatedData);
+
         return response()->json(['response' => new PostResource($post)], Response::HTTP_OK);
     }
 
@@ -37,6 +38,7 @@ class PostController extends Controller
     {
         $validatedData = $request->validated();
         $post = $this->postService->updateEntity($validatedData);
+
         return response()->json(['response' => new PostResource($post)], Response::HTTP_OK);
     }
 
