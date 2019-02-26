@@ -30,6 +30,16 @@ class PostService
         $this->categoryRepository = $categoryRepository;
     }
 
+    public function getPosts($page, $limit, $categoryId, $tag)
+    {
+        return $this->postRepository->getPaginated($page, $limit, $categoryId, $tag);
+    }
+
+    public function getPost($postId)
+    {
+        return $this->postRepository->findById($postId);
+    }
+
     public function createEntity(array $data)
     {
         $post = new Post();

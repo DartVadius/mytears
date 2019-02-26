@@ -8,8 +8,10 @@
 
 namespace App\Http\Controllers\Api\Post;
 
+use App\Entities\Post;
 use App\Http\Requests\Post\CreatePost;
 use App\Http\Requests\Post\UpdatePost;
+use App\Http\Resources\Collections\PostsCollection;
 use App\Http\Resources\PostResource;
 use App\Services\Post\PostService;
 use Illuminate\Http\Request;
@@ -44,6 +46,24 @@ class PostController extends Controller
 
     public function getPost(Request $request, $post_id = null)
     {
+        if ($post_id) {
+            $result = $this->postService->getPost($post_id);
 
+            return response()->json(['response' => new PostResource($result)], Response::HTTP_OK);
+        }
+
+        $page = $request->get('page');
+        $limit = $request->get('limit');
+        $categoryId = $request->get('category');
+        $tagId = null;
+        if ($tag = $request->get('tag')) {
+            $tagId = explode(',', $tag);
+        }
+
+        $result = $this->postService->getPosts($page, $limit, $categoryId, $tagId);
+
+        $collection = new Collection($result['results']);
+        // todo добавить пагинацию в респонс
+        return response()->json(['response' => PostsCollection::collection($collection)], Response::HTTP_OK);
     }
 }

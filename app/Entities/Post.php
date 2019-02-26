@@ -30,6 +30,9 @@ class Post implements EntityInterface
     const PUBLISHED_TRUE = 1;
     const PUBLISHED_FALSE = 0;
 
+    const PAGE = 1;
+    const LIMIT = 25;
+
     use Timestamps, MetaFields, Sluggable;
 
     /**
@@ -236,20 +239,14 @@ class Post implements EntityInterface
         return $this->deletedAt;
     }
 
-    public function all()
+    public function forCollection()
     {
         $response = [];
         $response['id'] = $this->getId();
         $response['title'] = $this->getTitle();
         $response['slug'] = $this->getSlug();
         $response['short_text'] = $this->getShortText();
-        $response['full_text'] = $this->getFullText();
-        $response['metaTitle'] = $this->getMetaTitle();
-        $response['metaKeywords'] = $this->getMetaKeywords();
-        $response['metaDescription'] = $this->getMetaDescription();
-        $response['createdAt'] = $this->getCreatedAt();
         $response['updatedAt'] = $this->getUpdatedAt();
-        $response['deletedAt'] = $this->getDeletedAt();
         $response['publish'] = $this->getPublish();
         $response['order'] = $this->getOrder();
         $response['tags'] = [];
@@ -260,6 +257,18 @@ class Post implements EntityInterface
         if ($parent = $this->getCategory()) {
             $response['category_id'] = $parent->getId();
         }
+        return $response;
+    }
+
+    public function all()
+    {
+        $response = $this->forCollection();
+        $response['full_text'] = $this->getFullText();
+        $response['metaTitle'] = $this->getMetaTitle();
+        $response['metaKeywords'] = $this->getMetaKeywords();
+        $response['metaDescription'] = $this->getMetaDescription();
+        $response['createdAt'] = $this->getCreatedAt();
+        $response['deletedAt'] = $this->getDeletedAt();
         return $response;
     }
 
