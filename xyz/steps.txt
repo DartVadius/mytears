@@ -370,8 +370,12 @@ PUT /api/posts
 Route::put('/posts', 'Post\PostController@updatePost');
 
 
+Для пороверки динамических параметров роутов добавляем миддлварю
+php artisan make:middleware RouteParamIntegerValidate
+регистрируем ее в app/Http/Kernel.php
+и используем для роутов в routes/api.php
 
-
+Также добавляем GetPost в реквесты для валидации гет-параметров в GET запросе
 
 
 

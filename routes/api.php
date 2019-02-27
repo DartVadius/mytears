@@ -13,8 +13,8 @@ Route::group(
     function () {
         Route::get('/', 'HomeController@index');
         Route::post('/register', 'Auth\RegisterController@register');
-        Route::get('/categories/{category_id?}', 'Category\CategoryController@getCategory');
-        Route::get('/posts/{post_id?}', 'Post\PostController@getPost');
+        Route::get('/categories/{category_id?}', 'Category\CategoryController@getCategory')->middleware('integer');
+        Route::get('/posts/{post_id?}', 'Post\PostController@getPost')->middleware('integer');
     }
 );
 

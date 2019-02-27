@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api\Post;
 
 use App\Entities\Post;
 use App\Http\Requests\Post\CreatePost;
+use App\Http\Requests\Post\GetPost;
 use App\Http\Requests\Post\UpdatePost;
 use App\Http\Resources\Collections\PostsCollection;
 use App\Http\Resources\PostResource;
@@ -44,14 +45,17 @@ class PostController extends Controller
         return response()->json(['response' => new PostResource($post)], Response::HTTP_OK);
     }
 
-    public function getPost(Request $request, $post_id = null)
+    public function getPost(GetPost $request, $post_id = null)
     {
         if ($post_id) {
             $result = $this->postService->getPost($post_id);
 
             return response()->json(['response' => new PostResource($result)], Response::HTTP_OK);
         }
-
+        $validatedData = $request->validated();
+        // todo
+        print_r($validatedData);
+        die;
         $page = $request->get('page');
         $limit = $request->get('limit');
         $categoryId = $request->get('category');
@@ -60,9 +64,12 @@ class PostController extends Controller
             $tagId = explode(',', $tag);
         }
 
+        // todo валидация гет-параметров???
+
         $result = $this->postService->getPosts($page, $limit, $categoryId, $tagId);
 
         $collection = new Collection($result['results']);
+
         // todo добавить пагинацию в респонс
         return response()->json(['response' => PostsCollection::collection($collection)], Response::HTTP_OK);
     }
