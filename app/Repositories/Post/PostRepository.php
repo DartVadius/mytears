@@ -26,8 +26,7 @@ class PostRepository extends BaseRepository
             $qb->andWhere(':tagId MEMBER OF p.tags')->setParameter('tagId', $tagId);
         }
 
-        $query = $qb->getQuery();
-        $count = count($query->getArrayResult());
+        $count = count($qb->getQuery()->getResult());
         $pages = ceil($count / $limit);
 
         $qb->setFirstResult($limit * ($page - 1))->setMaxResults($limit);
@@ -37,8 +36,9 @@ class PostRepository extends BaseRepository
 
         return [
             'results' => $query->getResult(),
-            'limit' => $limit,
-            'pages' => $pages,
+            'limit' => (int)$limit,
+            'pages' =>(int) $pages,
+            'page' => (int)$page,
             'links' => [
                 'prev' => ((int)$page > 1 && (($pages - (int)$page) >= 0)) ? $link . 'page=' . ($page - 1) : null,
                 'next' => ((int)$page < $pages) ? $link . 'page=' . ($page + 1) : null,

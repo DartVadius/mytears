@@ -56,7 +56,7 @@ class PostService
             if (!$category = $this->categoryRepository->getCategory($data['category_id'])) {
                 abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong category id.');
             }
-            $category->addPost($post);
+            $post->setCategory($category);
         }
         if (is_array($data['tags'])) {
             foreach ($data['tags'] as $tagId) {

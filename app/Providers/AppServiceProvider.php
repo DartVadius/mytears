@@ -13,8 +13,6 @@ use App\Repositories\User\UserRepository;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 
-//use App\Repositories\User\UserRepository;
-
 class AppServiceProvider extends ServiceProvider
 {
     /**

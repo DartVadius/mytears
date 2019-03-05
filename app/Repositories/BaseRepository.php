@@ -90,4 +90,9 @@ class BaseRepository extends \Doctrine\ORM\EntityRepository implements BaseRepos
     public function findById($id) {
         return $this->findOneBy(['id' => $id]);
     }
+
+    public function getEntityManager()
+    {
+        return parent::getEntityManager();
+    }
 }

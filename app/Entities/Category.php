@@ -74,9 +74,23 @@ class Category implements EntityInterface
         return $this->id;
     }
 
+    public function setId($value)
+    {
+        $this->id = $value;
+
+        return $this;
+    }
+
     public function getDeletedAt()
     {
         return $this->deletedAt;
+    }
+
+    public function setDeletedAt($value)
+    {
+        $this->deletedAt = $value;
+
+        return $this;
     }
 
     /**

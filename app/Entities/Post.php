@@ -38,7 +38,7 @@ class Post implements EntityInterface
     /**
      * Many Posts have One Parent Category.
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="posts")
-     * @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=true, unique=false)
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=true, unique=false, onDelete="set null")
      */
     private $category;
 
@@ -176,6 +176,7 @@ class Post implements EntityInterface
     public function setCategory(Category $category)
     {
         $this->category = $category;
+        $category->addPost($this);
 
         return $this;
     }

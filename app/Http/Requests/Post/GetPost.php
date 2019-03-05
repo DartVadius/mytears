@@ -14,9 +14,10 @@ class GetPost extends FormRequest
     public function rules()
     {
         return [
-            'page' => 'integer',
-            'limit' => 'integer',
-            'category' => 'integer',
+            'page' => 'integer|nullable',
+            'limit' => 'integer|nullable',
+            'category' => 'integer|nullable',
+            'tag' => 'string|nullable'
         ];
     }
 }

@@ -20,7 +20,7 @@ class CategoryRepository extends BaseRepository
     {
         if (!$result = $this->findById($categoryId))
         {
-            return abort(Response::HTTP_NO_CONTENT);
+            return $result;
         }
         if ($withChildren === 'true') {
             $rsm = new ResultSetMappingBuilder($this->getEntityManager());
@@ -42,5 +42,17 @@ class CategoryRepository extends BaseRepository
     public function getCategories()
     {
         return $this->findAll();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDeletedCategories()
+    {
+        $this->getEntityManager()->getFilters()->disable('soft-deleteable');
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $query = $qb->select('c')->from(Category::class, 'c')->where('c.deletedAt IS NOT NULL')->getQuery();
+
+        return $query->getResult();
     }
 }

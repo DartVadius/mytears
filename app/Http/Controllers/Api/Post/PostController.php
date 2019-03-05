@@ -15,7 +15,6 @@ use App\Http\Requests\Post\UpdatePost;
 use App\Http\Resources\Collections\PostsCollection;
 use App\Http\Resources\PostResource;
 use App\Services\Post\PostService;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
@@ -53,24 +52,21 @@ class PostController extends Controller
             return response()->json(['response' => new PostResource($result)], Response::HTTP_OK);
         }
         $validatedData = $request->validated();
-        // todo
-        print_r($validatedData);
-        die;
-        $page = $request->get('page');
-        $limit = $request->get('limit');
-        $categoryId = $request->get('category');
         $tagId = null;
-        if ($tag = $request->get('tag')) {
+        if (isset($validatedData['tag']) && $tag = $validatedData['tag']) {
             $tagId = explode(',', $tag);
         }
-
-        // todo валидация гет-параметров???
-
-        $result = $this->postService->getPosts($page, $limit, $categoryId, $tagId);
-
+        $result = $this->postService->getPosts(isset($validatedData['page']) ? $validatedData['page'] : null,
+            isset($validatedData['limit']) ? $validatedData['limit'] : null,
+            isset($validatedData['category']) ? $validatedData['category'] : null, $tagId);
         $collection = new Collection($result['results']);
 
-        // todo добавить пагинацию в респонс
-        return response()->json(['response' => PostsCollection::collection($collection)], Response::HTTP_OK);
+        return response()->json([
+            'response' => PostsCollection::collection($collection),
+            'limit' => $result['limit'],
+            'pages'=> $result['pages'],
+            'page'=> $result['page'],
+            'links' => $result['links'],
+        ], Response::HTTP_OK);
     }
 }

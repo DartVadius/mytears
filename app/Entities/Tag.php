@@ -95,4 +95,17 @@ class Tag implements EntityInterface
         return $this;
     }
 
+    public function all()
+    {
+        $response = [];
+        $response['id'] = $this->getId();
+        $response['title'] = $this->getTitle();
+        $response['slug'] = $this->getSlug();
+        $response['metaTitle'] = $this->getMetaTitle();
+        $response['metaKeywords'] = $this->getMetaKeywords();
+        $response['metaDescription'] = $this->getMetaDescription();
+
+        return $response;
+    }
+
 }

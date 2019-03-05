@@ -52,4 +52,26 @@ class CategoryController extends Controller
         $category = $this->categoryService->updateEntity($validatedData);
         return response()->json(['response' => new CategoryResource($category)], Response::HTTP_OK);
     }
+
+    public function deleteCategory($category_id)
+    {
+        $this->categoryService->deleteEntity($category_id);
+
+        return response()->json(null, Response::HTTP_OK);
+    }
+
+    public function restoreCategory($category_id)
+    {
+        $category = $this->categoryService->restoreDeletedEntity($category_id);
+
+        return response()->json(['response' => new CategoryResource($category)], Response::HTTP_OK);
+    }
+
+    public function getDeletedCategory()
+    {
+        $result = $this->categoryService->getDeletedEntities();
+        $collection = new Collection($result);
+
+        return response()->json(['response' => CategoriesCollection::collection($collection)], Response::HTTP_OK);
+    }
 }
