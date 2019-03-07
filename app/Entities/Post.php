@@ -240,6 +240,13 @@ class Post implements EntityInterface
         return $this->deletedAt;
     }
 
+    public function setDeletedAt($value)
+    {
+        $this->deletedAt = $value;
+
+        return $this;
+    }
+
     public function forCollection()
     {
         $response = [];
@@ -252,7 +259,7 @@ class Post implements EntityInterface
         $response['order'] = $this->getOrder();
         $response['tags'] = [];
         foreach ($this->tags as $tag) {
-            $tags[] = $tag->getId();
+            $response['tags'][] = $tag->getId();
         }
         $response['category_id'] = null;
         if ($parent = $this->getCategory()) {

@@ -37,7 +37,10 @@ class PostService
 
     public function getPost($postId)
     {
-        return $this->postRepository->findById($postId);
+        if (!$post = $this->postRepository->findById($postId)) {
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong post id.');
+        }
+        return $post;
     }
 
     public function createEntity(array $data)
@@ -67,6 +70,37 @@ class PostService
             }
         }
         return $this->save($post);
+    }
+
+    public function deleteEntity($post_id)
+    {
+        /**@var $post Post */
+        if (!$post = $this->getPost($post_id)) {
+
+            return abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong post Id');
+        }
+        $this->postRepository->delete($post);
+
+        return null;
+    }
+
+    public function restoreDeletedEntity($id)
+    {
+        // restore soft deleted entities
+        $this->postRepository->getEntityManager()->getFilters()->disable('soft-deleteable');
+        /**@var $post Post */
+        $post = $this->postRepository->findById($id);
+        if ($post) {
+            $post->setDeletedAt(null);
+            $this->save($post);
+        }
+
+        return $post;
+    }
+
+    public function getDeletedEntities()
+    {
+        return $this->postRepository->getDeletedPosts();
     }
 
     public function updateEntity(array $data)

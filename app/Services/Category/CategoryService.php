@@ -33,18 +33,6 @@ class CategoryService
         return $this->categoryRepository->getCategories();
     }
 
-    public function deleteEntity($category_id)
-    {
-        /**@var $category Category */
-        if (!$category = $this->getCategory($category_id, null)) {
-
-            return abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong category Id');
-        }
-        $this->categoryRepository->delete($category);
-
-        return null;
-    }
-
     public function createEntity(array $data)
     {
         $category = new Category();
@@ -63,6 +51,18 @@ class CategoryService
         }
 
         return $this->save($category);
+    }
+
+    public function deleteEntity($category_id)
+    {
+        /**@var $category Category */
+        if (!$category = $this->getCategory($category_id, null)) {
+
+            return abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong category Id');
+        }
+        $this->categoryRepository->delete($category);
+
+        return null;
     }
 
     public function restoreDeletedEntity($id)

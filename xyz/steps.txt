@@ -341,26 +341,25 @@ public function getCategories()
 
 Публичные ресурсы
 
+GET /api/categories
+GET /api/categories/100
 GET /api/categories/100?children=true
+
 Route::get('/categories/{category_id?}', 'Api\Category\CategoryController@getCategory');
 
 Ресурсы админки
 
 GET /api/categories/deleted
-Route::get('/categories/deleted', 'Api\Category\CategoryController@getDeletedCategory');
-
 POST /api/categories
-Route::post('/categories', 'Category\CategoryController@createCategory');
-
 PUT /api/categories
-Route::put('/categories', 'Category\CategoryController@updateCategory');
-
+PUT /api/categories/{category_id}/restore // восстановление категории удаленной через soft delete
 DELETE /api/categories/{category_id}
-Route::delete('/categories/{category_id}', 'Category\CategoryController@deleteCategory')
 
-// восстановление категории удаленной через soft delete
-PUT /api/categories/{category_id?}/restore
-Route::put('/categories/{category_id}/restore', 'Category\CategoryController@restoreCategory')
+Route::get('/categories/deleted', 'Category\CategoryController@getDeletedCategory');
+Route::post('/categories', 'Category\CategoryController@createCategory');
+Route::put('/categories', 'Category\CategoryController@updateCategory');
+Route::put('/categories/{category_id}/restore', 'Category\CategoryController@restoreCategory')->middleware('integer');
+Route::delete('/categories/{category_id}', 'Category\CategoryController@deleteCategory')->middleware('integer');
 
 29.2 Посты
 
@@ -368,18 +367,24 @@ Route::put('/categories/{category_id}/restore', 'Category\CategoryController@res
 
 Публичные ресурсы
 
+GET /api/posts/{post_id}
 GET /api/posts?category=1&tag=1&page=1&limit=25
+
 Route::get('/posts/{post_id?}', 'Post\PostController@getPost');
 
 Ресурсы админки
 
+GET /api/posts/deleted
 POST /api/posts
-Route::post('/posts', 'Post\PostController@createPost');
-
 PUT /api/posts
-Route::put('/posts', 'Post\PostController@updatePost');
+PUT /api/posts/{post_id}/restore
+DELETE /api/posts/{post_id}
 
-...
+Route::post('/posts', 'Post\PostController@createPost');
+Route::put('/posts', 'Post\PostController@updatePost');
+Route::get('/posts/deleted', 'Post\PostController@getDeletedPosts');
+Route::put('/posts/{post_id}/restore', 'Post\PostController@restorePost')->middleware('integer');
+Route::delete('/posts/{post_id}', 'Post\PostController@deletePost')->middleware('integer');
 
 Также добавляем GetPost в реквесты для валидации гет-параметров в GET запросе
 В репозитории PostRepository добавляем пагинацию запросов
@@ -387,8 +392,26 @@ Route::put('/posts', 'Post\PostController@updatePost');
 //todo Оптимизировать запросы https://ourcodeworld.com/articles/read/2/5-simple-tips-for-boost-the-database-handling-with-symfony2-and-doctrine
 
 29.3 Аналогично с тэгами
+Для тэгов мы не используем мягкое удаление, поэтому там не нужно реализоавывать восстановление и получение удаленных тегов
 
-29.4 Для пороверки динамических параметров роутов добавляем миддлварю
+Публичные ресурсы
+
+GET /api/tags
+GET /api/tags/{tag_id}
+
+Route::get('/posts/{tag_id?}', 'Post\PostController@getPost');
+
+Ресурсы админки
+
+POST /api/tags
+PUT /api/tags
+DELETE /api/tags/{tag_id}
+
+Route::post('/tags', 'Tag\TagController@createTag');
+Route::put('/tags', 'Tag\TagController@updateTag');
+Route::delete('/tags/{tag_id}', 'Tag\TagController@deleteTag')->middleware('integer');
+
+29.4 Для валидации динамических параметров роутов добавляем миддлварю
 
 php artisan make:middleware RouteParamIntegerValidate
 регистрируем ее в app/Http/Kernel.php

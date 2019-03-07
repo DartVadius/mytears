@@ -38,13 +38,13 @@ Route::group(
 
         Route::post('/posts', 'Post\PostController@createPost');
         Route::put('/posts', 'Post\PostController@updatePost');
-        // todo
-        Route::get('/posts/deleted', 'Post\PostControlle@getDeletedPost');
+        Route::get('/posts/deleted', 'Post\PostController@getDeletedPosts');
         Route::put('/posts/{post_id}/restore', 'Post\PostController@restorePost')->middleware('integer');
         Route::delete('/posts/{post_id}', 'Post\PostController@deletePost')->middleware('integer');
 
         Route::post('/tags', 'Tag\TagController@createTag');
         Route::put('/tags', 'Tag\TagController@updateTag');
+        Route::delete('/tags/{tag_id}', 'Tag\TagController@deleteTag')->middleware('integer');
     }
 );
 

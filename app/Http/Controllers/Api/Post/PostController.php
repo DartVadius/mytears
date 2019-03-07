@@ -69,4 +69,26 @@ class PostController extends Controller
             'links' => $result['links'],
         ], Response::HTTP_OK);
     }
+
+    public function deletePost($post_id)
+    {
+        $this->postService->deleteEntity($post_id);
+
+        return response()->json(null, Response::HTTP_OK);
+    }
+
+    public function restorePost($post_id)
+    {
+        $result = $this->postService->restoreDeletedEntity($post_id);
+
+        return response()->json(['response' => new PostResource($result)], Response::HTTP_OK);
+    }
+
+    public function getDeletedPosts()
+    {
+        $result = $this->postService->getDeletedEntities();
+        $collection = new Collection($result);
+
+        return response()->json(['response' => PostsCollection::collection($collection)], Response::HTTP_OK);
+    }
 }

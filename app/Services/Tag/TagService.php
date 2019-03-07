@@ -63,6 +63,18 @@ class TagService
         return $this->save($tag);
     }
 
+    public function deleteEntity($tag_id)
+    {
+        /**@var $tag Tag */
+        if (!$tag = $this->getTag($tag_id)) {
+
+            return abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong tag Id');
+        }
+        $this->tagRepository->delete($tag);
+
+        return null;
+    }
+
     public function getTag($tagId)
     {
         /**@var $tag Tag */

@@ -55,4 +55,11 @@ class TagController extends Controller
 
         return response()->json(['response' => TagsCollection::collection($collection)], Response::HTTP_OK);
     }
+
+    public function deleteTag($tag_id)
+    {
+        $this->tagService->deleteEntity($tag_id);
+
+        return response()->json(null, Response::HTTP_OK);
+    }
 }

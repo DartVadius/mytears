@@ -30,6 +30,9 @@ class PostRepository extends BaseRepository
         $pages = ceil($count / $limit);
 
         $qb->setFirstResult($limit * ($page - 1))->setMaxResults($limit);
+
+        // todo order by post_order and created_at
+
         $query = $qb->getQuery();
 
         $link .= 'limit=' . $limit  . '&';
@@ -44,5 +47,17 @@ class PostRepository extends BaseRepository
                 'next' => ((int)$page < $pages) ? $link . 'page=' . ($page + 1) : null,
             ],
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDeletedPosts()
+    {
+        $this->getEntityManager()->getFilters()->disable('soft-deleteable');
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $query = $qb->select('c')->from(Post::class, 'c')->where('c.deletedAt IS NOT NULL')->getQuery();
+
+        return $query->getResult();
     }
 }
