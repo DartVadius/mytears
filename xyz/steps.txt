@@ -418,6 +418,8 @@ php artisan make:middleware RouteParamIntegerValidate
 и используем для роутов в routes/api.php
 
 
+30 Кеширование - добавляем в Post контроллере кеширование постов
+
 
 
 аутентификация - процесс залогинивания, т.е. техническая часть

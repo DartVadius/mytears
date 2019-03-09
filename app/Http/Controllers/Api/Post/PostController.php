@@ -41,24 +41,28 @@ class PostController extends Controller
         $validatedData = $request->validated();
         $post = $this->postService->updateEntity($validatedData);
 
+        \Cache::forget('post_' . $post->getId());
+
         return response()->json(['response' => new PostResource($post)], Response::HTTP_OK);
     }
 
     public function getPost(GetPost $request, $post_id = null)
     {
         if ($post_id) {
-            $result = $this->postService->getPost($post_id);
+            $result = \Cache::rememberForever('post_' . $post_id, function () use ($post_id, $request) {
+                return (new PostResource($this->postService->getPost($post_id)))->toArray($request);
+            });
 
-            return response()->json(['response' => new PostResource($result)], Response::HTTP_OK);
+            return response()->json(['response' => $result], Response::HTTP_OK);
         }
         $validatedData = $request->validated();
         $tagId = null;
         if (isset($validatedData['tag']) && $tag = $validatedData['tag']) {
             $tagId = explode(',', $tag);
         }
-        $result = $this->postService->getPosts(isset($validatedData['page']) ? $validatedData['page'] : null,
-            isset($validatedData['limit']) ? $validatedData['limit'] : null,
-            isset($validatedData['category']) ? $validatedData['category'] : null, $tagId);
+        $result = $this->postService->getPosts($validatedData['page'] ?? null,
+            $validatedData['limit'] ?? null,
+            $validatedData['category'] ?? null, $tagId);
         $collection = new Collection($result['results']);
 
         return response()->json([
@@ -73,6 +77,8 @@ class PostController extends Controller
     public function deletePost($post_id)
     {
         $this->postService->deleteEntity($post_id);
+
+        \Cache::forget('post_' . $post_id);
 
         return response()->json(null, Response::HTTP_OK);
     }

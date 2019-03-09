@@ -29,9 +29,9 @@ class PostRepository extends BaseRepository
         $count = count($qb->getQuery()->getResult());
         $pages = ceil($count / $limit);
 
-        $qb->setFirstResult($limit * ($page - 1))->setMaxResults($limit);
+        $qb->orderBy('p.order', 'ASC')->addOrderBy('p.createdAt', 'DESC');
 
-        // todo order by post_order and created_at
+        $qb->setFirstResult($limit * ($page - 1))->setMaxResults($limit);
 
         $query = $qb->getQuery();
 
