@@ -15,6 +15,7 @@ use App\Entities\Tag;
 use App\Repositories\Category\CategoryRepository;
 use App\Repositories\Tag\TagRepository;
 use App\Repositories\Post\PostRepository;
+use App\Repositories\User\UserRepository;
 use Illuminate\Http\Response;
 
 class PostService
@@ -22,27 +23,46 @@ class PostService
     private $postRepository;
     private $tagRepository;
     private $categoryRepository;
+    private $userRepository;
 
-    public function __construct(PostRepository $postRepository, TagRepository $tagRepository, CategoryRepository $categoryRepository)
+    public function __construct(PostRepository $postRepository, TagRepository $tagRepository, CategoryRepository $categoryRepository, UserRepository $userRepository)
     {
         $this->postRepository = $postRepository;
         $this->tagRepository = $tagRepository;
         $this->categoryRepository = $categoryRepository;
+        $this->userRepository = $userRepository;
     }
 
-    public function getPosts($page, $limit, $categoryId, $tag)
+    /**
+     * @param integer|null  $page               page to show (1 by default)
+     * @param integer|null  $limit              posts per page (25 by default)
+     * @param integer|null  $categoryId         filter by category Id
+     * @param array|null    $tag                filter by tags Id`s
+     * @param bool          $withUnpublished    show/do not show unpublished posts
+     * @return Post array                       Posts collection
+     */
+    public function getPosts($page, $limit, $categoryId, $tag, $withUnpublished = false)
     {
-        return $this->postRepository->getPaginated($page, $limit, $categoryId, $tag);
+        return $this->postRepository->getPaginated($page, $limit, $categoryId, $tag, $withUnpublished);
     }
 
-    public function getPost($postId)
+    /**
+     * @param integer   $postId             post Id
+     * @param bool      $withUnpublished    show/do not show unpublished post
+     * @return Post object|null
+     */
+    public function getPost($postId, $withUnpublished = false)
     {
-        if (!$post = $this->postRepository->findById($postId)) {
+        if (!$post = $this->postRepository->findById($postId, $withUnpublished)) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong post id.');
         }
         return $post;
     }
 
+    /**
+     * @param array $data
+     * @return Post
+     */
     public function createEntity(array $data)
     {
         $post = new Post();
@@ -72,18 +92,28 @@ class PostService
         return $this->save($post);
     }
 
+    /**
+     * @param $post_id
+     * @return void|null
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
+     */
     public function deleteEntity($post_id)
     {
         /**@var $post Post */
         if (!$post = $this->getPost($post_id)) {
 
-            return abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong post Id');
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong post Id');
         }
         $this->postRepository->delete($post);
 
         return null;
     }
 
+    /**
+     * @param integer $id   Post id
+     * @return Post
+     */
     public function restoreDeletedEntity($id)
     {
         // restore soft deleted entities
@@ -98,15 +128,22 @@ class PostService
         return $post;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDeletedEntities()
     {
         return $this->postRepository->getDeletedPosts();
     }
 
+    /**
+     * @param array $data
+     * @return Post
+     */
     public function updateEntity(array $data)
     {
         /** @var $post Post */
-        if (!$post = $this->postRepository->findById($data['id'])) {
+        if (!$post = $this->postRepository->findById($data['id'], true)) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Wrong post Id.');
         }
 
@@ -162,6 +199,10 @@ class PostService
         return $this->save($post);
     }
 
+    /**
+     * @param Post $post
+     * @return Post
+     */
     private function save(Post $post)
     {
         try {

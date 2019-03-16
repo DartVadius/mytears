@@ -36,9 +36,9 @@ Route::group(
         Route::put('/categories/{category_id}/restore', 'Category\CategoryController@restoreCategory')->middleware('integer');
         Route::delete('/categories/{category_id}', 'Category\CategoryController@deleteCategory')->middleware('integer');
 
+        Route::get('/posts/deleted', 'Post\PostController@getDeletedPosts');
         Route::post('/posts', 'Post\PostController@createPost');
         Route::put('/posts', 'Post\PostController@updatePost');
-        Route::get('/posts/deleted', 'Post\PostController@getDeletedPosts');
         Route::put('/posts/{post_id}/restore', 'Post\PostController@restorePost')->middleware('integer');
         Route::delete('/posts/{post_id}', 'Post\PostController@deletePost')->middleware('integer');
 

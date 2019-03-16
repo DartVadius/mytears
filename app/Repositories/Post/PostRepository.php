@@ -8,7 +8,7 @@ use App\Repositories\BaseRepository;
 
 class PostRepository extends BaseRepository
 {
-    public function getPaginated($page, $limit, $categoryId, $tagId)
+    public function getPaginated($page, $limit, $categoryId, $tagId, $withUnpublished)
     {
         $page = $page ? $page : Post::PAGE;
         $limit = $limit ? $limit : Post::LIMIT;
@@ -24,6 +24,10 @@ class PostRepository extends BaseRepository
         if ($tagId) {
             $link .= 'tag=' . implode(',', $tagId) . '&';
             $qb->andWhere(':tagId MEMBER OF p.tags')->setParameter('tagId', $tagId);
+        }
+
+        if (!$withUnpublished) {
+            $qb->andWhere('p.publish = :publish')->setParameter('publish', Post::PUBLISHED_TRUE);
         }
 
         $count = count($qb->getQuery()->getResult());
@@ -59,5 +63,17 @@ class PostRepository extends BaseRepository
         $query = $qb->select('c')->from(Post::class, 'c')->where('c.deletedAt IS NOT NULL')->getQuery();
 
         return $query->getResult();
+    }
+
+    public function findById($id, $withUnpublished = false)
+    {
+        /**@var $post Post*/
+        if ($post = parent::findById($id)) {
+//            print_r($post->all());
+            if (!$post->isPublish() && !$withUnpublished) {
+                $post = null;
+            }
+        }
+        return $post;
     }
 }

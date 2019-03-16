@@ -19,6 +19,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Cache;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -44,19 +45,27 @@ class PostController extends Controller
         $validatedData = $request->validated();
         $post = $this->postService->updateEntity($validatedData);
 
-        // todo сброс кеша при изменении статуса поста с published на unpublished и наоборот
-        // todo добавить в sql запросы проверку на published, возможно добавить дополнительный урл для админки
-
         Cache::forget('post_' . $post->getId());
+        if (array_key_exists('publish', $validatedData)) {
+            Cache::tags(['posts_selection'])->flush();
+        }
 
         return response()->json(['response' => new PostResource($post)], Response::HTTP_OK);
     }
 
     public function getPost(GetPost $request, $post_id = null)
     {
+        if ($request->user('api') && $request->user('api')->isAdmin()) {
+            return $this->getPostAdmin($request, $post_id);
+        }
+        return $this->getPostUser($request, $post_id);
+    }
+
+    private function getPostUser(GetPost $request, $post_id = null)
+    {
         if ($post_id) {
             $result = Cache::rememberForever('post_' . $post_id, function () use ($post_id, $request) {
-                return (new PostResource($this->postService->getPost($post_id)))->toArray($request);
+                return (new PostResource($this->postService->getPost($post_id, false)))->toArray($request);
             });
 
             return response()->json(['response' => $result], Response::HTTP_OK);
@@ -67,12 +76,13 @@ class PostController extends Controller
             $tagId = explode(',', $tag);
         }
 
-        $key = 'page_' . ($validatedData['page'] ?? null) . '_limit_' . ($validatedData['limit'] ?? null) . '_category_' . ($validatedData['category'] ?? null) . '_tag_' . $tagId;
+        $key = 'page_' . ($validatedData['page'] ?? null) . '_limit_' . ($validatedData['limit'] ?? null) . '_category_'
+            . ($validatedData['category'] ?? null) . '_tag_' . ((is_array($tagId)) ? implode('_', $tagId) : null);
 
         $result = Cache::tags(['posts_selection'])->rememberForever($key, function () use ($validatedData, $tagId, $request) {
             $response = $this->postService->getPosts($validatedData['page'] ?? null,
                 $validatedData['limit'] ?? null,
-                $validatedData['category'] ?? null, $tagId);
+                $validatedData['category'] ?? null, $tagId, false);
             $collection = new Collection($response['results']);
             return [
                 'response' => (PostsCollection::collection($collection))->toArray($request),
@@ -84,6 +94,32 @@ class PostController extends Controller
         });
 
         return response()->json($result, Response::HTTP_OK);
+    }
+
+    private function getPostAdmin(GetPost $request, $post_id = null)
+    {
+        if ($post_id) {
+            return response()->json(['response' => new PostResource($this->postService->getPost($post_id, true))], Response::HTTP_OK);
+        }
+        $validatedData = $request->validated();
+        $tagId = null;
+        if (isset($validatedData['tag']) && $tag = $validatedData['tag']) {
+            $tagId = explode(',', $tag);
+        }
+
+        $response = $this->postService->getPosts($validatedData['page'] ?? null,
+            $validatedData['limit'] ?? null,
+            $validatedData['category'] ?? null,
+            $tagId, true);
+        $collection = new Collection($response['results']);
+
+        return response()->json([
+            'response' => (PostsCollection::collection($collection)),
+            'limit' => $response['limit'],
+            'pages'=> $response['pages'],
+            'page'=> $response['page'],
+            'links' => $response['links'],
+        ], Response::HTTP_OK);
     }
 
     public function deletePost($post_id)

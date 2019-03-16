@@ -12,4 +12,9 @@ class UserRepository extends BaseRepository implements UserInterface
     {
         return $this->findOneBy(['email' => $email]);
     }
+
+    public function findByToken($token)
+    {
+        return $this->findOneBy(['rememberToken' => $token]);
+    }
 }

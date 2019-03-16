@@ -113,6 +113,11 @@ class Post implements EntityInterface
         return $this;
     }
 
+    public function isPublish()
+    {
+        return $this->publish === self::PUBLISHED_TRUE;
+    }
+
     public function getShortText()
     {
         return $this->shortText;
